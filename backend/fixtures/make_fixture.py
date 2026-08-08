@@ -14,7 +14,10 @@ def main() -> None:
         subprocess.run([
             "ffmpeg", "-y", "-f", "lavfi",
             "-i", "testsrc2=size=320x240:rate=30:duration=3",
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", str(CLIP_VIDEO),
+            "-f", "lavfi",
+            "-i", "sine=frequency=440:duration=3",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest",
+            str(CLIP_VIDEO),
         ], check=True)
     if not TONE.exists():
         subprocess.run([
