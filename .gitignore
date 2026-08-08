@@ -6,6 +6,5 @@ __pycache__/
 .pytest_cache/
 projects/
 backend/preview_tmp.mp4
-backend/tests/fixtures/clip_video.mp4
 node_modules/
 dist/
