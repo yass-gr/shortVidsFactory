@@ -2,6 +2,9 @@
 .superpowers/
 __pycache__/
 *.pyc
+.venv/
+backend/.venv/
+.pytest_cache/
 projects/
 backend/preview_tmp.mp4
 backend/tests/fixtures/clip_video.mp4
