@@ -8,6 +8,7 @@ dependencies = [
   "pydantic",
   "faster-whisper",
   "python-multipart",
+  "httpx2",
 ]
 
 [tool.pytest.ini_options]
