@@ -299,6 +299,35 @@ def test_snapshot_roundtrip():
     assert r2.json() == snapshot
 
 
+def test_snapshot_put_rejects_garbage_numeric_cut():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    bad = {
+        "cuts": [{"source_start": "0.0;rm -rf", "source_end": 1.0, "caption_lines": []}],
+        "music": None,
+        "font": "Arial",
+        "export_path": "",
+    }
+    r = client.put(f"/api/projects/{pid}/snapshot", json=bad)
+    assert r.status_code == 422
+
+
+def test_snapshot_put_coerces_numeric_strings_to_float():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    body = {
+        "cuts": [{"source_start": "0.0", "source_end": "1.5", "caption_lines": []}],
+        "music": None,
+        "font": "Arial",
+        "export_path": "",
+    }
+    r = client.put(f"/api/projects/{pid}/snapshot", json=body)
+    assert r.status_code == 200
+    stored = json.loads((_project_dir(pid) / "editor.json").read_text())
+    assert stored["cuts"][0]["source_start"] == 0.0
+    assert isinstance(stored["cuts"][0]["source_end"], float)
+
+
 def test_preview_builds_on_demand():
     client = TestClient(create_app())
     pid = _new_project(client)

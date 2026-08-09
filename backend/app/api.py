@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from .config import PROJECT_ROOT, project_dir
 from .editor import EditorSnapshot
@@ -236,8 +236,12 @@ def api_get_snapshot(project_id: str):
 @router.put("/projects/{project_id}/snapshot")
 def api_put_snapshot(project_id: str, snapshot: dict):
     pdir = _require_project(project_id)
-    save_json(pdir / "editor.json", snapshot)
-    return snapshot
+    try:
+        validated = EditorSnapshot.model_validate(snapshot)
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
+    save_json(pdir / "editor.json", validated.model_dump())
+    return validated.model_dump()
 
 
 @router.get("/projects/{project_id}/preview.mp4")
