@@ -44,8 +44,12 @@ def build_ass(snapshot: EditorSnapshot, get_font: Callable[[], str]) -> str:
     offset = 0.0
     for cut in snapshot.cuts:
         for cap in cut.caption_lines:
-            start = offset + (cap.start - cut.source_start)
-            end = offset + (cap.end - cut.source_start)
+            cap_start = max(cap.start, cut.source_start)
+            cap_end = min(cap.end, cut.source_end)
+            if cap_end - cap_start <= 0:
+                continue
+            start = offset + (cap_start - cut.source_start)
+            end = offset + (cap_end - cut.source_start)
             out.append(f"Dialogue: 0,{_fmt(start)},{_fmt(end)},Default,,0,0,0,,{cap.text}")
         offset += cut.source_end - cut.source_start
     return "\n".join(out) + "\n"

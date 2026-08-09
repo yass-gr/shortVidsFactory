@@ -28,6 +28,51 @@ FIXTURE_2S = Script(
 )
 
 
+def test_build_ass_clamps_captions_into_cut_bounds():
+    from app.editor import EditorSnapshot
+    from app.export import build_ass
+
+    snap = EditorSnapshot(
+        cuts=[
+            Cut(source_start=0.0, source_end=1.0, caption_lines=[
+                Caption(start=0.2, end=2.0, text="overrun"),
+            ]),
+            Cut(source_start=2.0, source_end=4.0, caption_lines=[]),
+        ],
+        music=None,
+        font="Arial",
+        export_path="",
+    )
+    ass = build_ass(snap, lambda: FONT)
+    lines = [l for l in ass.splitlines() if l.startswith("Dialogue:")]
+    assert len(lines) == 1
+    fields = lines[0].split(",")
+    assert fields[1] == "0:00:00.20"
+    assert fields[2] == "0:00:01.00"
+
+
+def test_build_ass_skips_collapsed_or_outside_captions():
+    from app.editor import EditorSnapshot
+    from app.export import build_ass
+
+    snap = EditorSnapshot(
+        cuts=[
+            Cut(source_start=0.0, source_end=1.0, caption_lines=[
+                Caption(start=0.0, end=1.0, text="inside"),
+                Caption(start=1.5, end=2.0, text="fully outside"),
+                Caption(start=0.9, end=0.9, text="zero duration"),
+            ]),
+        ],
+        music=None,
+        font="Arial",
+        export_path="",
+    )
+    ass = build_ass(snap, lambda: FONT)
+    lines = [l for l in ass.splitlines() if l.startswith("Dialogue:")]
+    assert len(lines) == 1
+    assert "inside" in lines[0]
+
+
 def test_export_produces_vertical_h264(tmp_path):
     snap = new_snapshot("p1", FIXTURE_2S)
     out = export_video(snap, SOURCE, tmp_path / "workspace", tmp_path / "out.mp4", lambda: FONT)
