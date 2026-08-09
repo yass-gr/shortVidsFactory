@@ -17,7 +17,6 @@ export default function ExportBar({ projectId, snapshot, enabled }) {
   const [error, setError] = useState(null)
 
   const canExport = enabled && !exporting && destination.trim() !== ''
-  const hasPicker = typeof window !== 'undefined' && !!window.showDirectoryPicker
 
   function handleExport() {
     if (!canExport) return
@@ -45,34 +44,17 @@ export default function ExportBar({ projectId, snapshot, enabled }) {
       })
   }
 
-  function handleBrowse() {
-    if (!hasPicker) return
-    window
-      .showDirectoryPicker()
-      .then((handle) => {
-        if (handle && handle.name) setDestination(handle.name)
-      })
-      .catch(() => {})
-  }
-
   return (
     <section>
       <h3>Export</h3>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <label>
-          Destination folder
-          <input
-            data-testid="export-destination"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-        </label>
-        {hasPicker && (
-          <button type="button" data-testid="export-browse" onClick={handleBrowse}>
-            Browse…
-          </button>
-        )}
-      </div>
+      <label>
+        Destination folder
+        <input
+          data-testid="export-destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+        />
+      </label>
       <button type="button" data-testid="export-button" onClick={handleExport} disabled={!canExport}>
         Export
       </button>
