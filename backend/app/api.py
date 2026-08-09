@@ -59,6 +59,8 @@ def _export_job(args: dict):
     pdir = _require_project(project_id)
     snapshot = EditorSnapshot.model_validate(load_json(pdir / "editor.json"))
     destination = Path(args["destination"])
+    if not destination.is_absolute():
+        destination = Path.home() / destination
     if destination.suffix == ".mp4":
         out_file = destination
     else:

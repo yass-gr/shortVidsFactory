@@ -331,6 +331,41 @@ def test_export_job_wired(tmp_path, monkeypatch):
     assert editor["export_path"] == str(out)
 
 
+def test_export_relative_destination_resolves_against_home(tmp_path, monkeypatch):
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    pdir = _project_dir(pid)
+    storage_mod.save_json(pdir / "editor.json", {
+        "cuts": [{"source_start": 0.0, "source_end": 0.8,
+                  "caption_lines": [{"start": 0.0, "end": 0.8, "text": "hi"}]}],
+        "music": None,
+        "font": "Arial",
+        "export_path": "",
+    })
+    fake_home = tmp_path / "home"
+    monkeypatch.setattr(Path, "home", staticmethod(lambda: fake_home))
+
+    seen = {}
+
+    def fake_export(snap, source, project_dir, destination, get_font=None):
+        seen["destination"] = destination
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(b"mp4")
+        return destination
+
+    monkeypatch.setattr(api_mod, "export_video", fake_export)
+
+    r = client.post(f"/api/projects/{pid}/export", json={"destination": "myvids"})
+    assert r.status_code == 200
+    job = _wait_job(r.json()["job_id"])
+    assert job.status == JobStatus.done
+    out = seen["destination"]
+    assert str(out) == str(fake_home / "myvids" / "shortvids_export.mp4")
+    assert out.exists()
+    editor = json.loads((pdir / "editor.json").read_text())
+    assert editor["export_path"] == str(out)
+
+
 def test_reveal_opens_export_folder(monkeypatch):
     client = TestClient(create_app())
     pid = _new_project(client)
