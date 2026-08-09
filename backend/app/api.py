@@ -58,7 +58,10 @@ def _export_job(args: dict):
 
 
 def _require_project(project_id: str) -> Path:
-    pdir = PROJECT_ROOT / project_id
+    root = PROJECT_ROOT.resolve()
+    pdir = (root / project_id).resolve()
+    if not pdir.is_relative_to(root):
+        raise HTTPException(status_code=404, detail="Project not found")
     if not pdir.is_dir():
         raise HTTPException(status_code=404, detail="Project not found")
     return pdir
@@ -106,7 +109,7 @@ def api_upload_entry(project_id: str, file: UploadFile = File(...)):
     info = probe(source)
     job = manager.submit("transcribe", _transcribe_job, {"project_id": project_id})
     return {
-        "id": job.id,
+        "project_id": project_id,
         "job_id": job.id,
         "media": {
             "width": info["width"],
@@ -150,8 +153,14 @@ class ApproveBody(BaseModel):
 @router.post("/projects/{project_id}/approve")
 def api_approve_script(project_id: str, body: ApproveBody):
     pdir = _require_project(project_id)
-    transcript = load_json(pdir / "transcript.json")
-    scripts_raw = load_json(pdir / "scripts.json")
+    try:
+        transcript = load_json(pdir / "transcript.json")
+        scripts_raw = load_json(pdir / "scripts.json")
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="transcript/scripts not generated yet - run upload and generate first",
+        )
     if isinstance(scripts_raw, dict):
         scripts_raw = [scripts_raw]
     chosen = next((s for s in scripts_raw if s.get("id") == body.script_id), None)

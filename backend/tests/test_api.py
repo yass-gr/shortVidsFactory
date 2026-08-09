@@ -3,15 +3,26 @@ import shutil
 import time
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 import app.api as api_mod
-from app.config import PROJECT_ROOT
+import app.config as config_mod
+import app.storage as storage_mod
 from app.main import create_app
 from app.jobs import manager, JobStatus
 from app.transcribe import WordSeg
 
 CLIP = Path(__file__).parent / "fixtures" / "clip_video.mp4"
+
+
+@pytest.fixture(autouse=True)
+def isolated_project_root(tmp_path, monkeypatch):
+    root = tmp_path / "projects"
+    monkeypatch.setattr(config_mod, "PROJECT_ROOT", root)
+    monkeypatch.setattr(api_mod, "PROJECT_ROOT", root)
+    monkeypatch.setattr(storage_mod, "PROJECT_ROOT", root)
+    return root
 
 
 class FakeTranscriber:
@@ -32,7 +43,7 @@ def _new_project(client, name="demo"):
 
 
 def _project_dir(project_id):
-    return PROJECT_ROOT / project_id
+    return config_mod.PROJECT_ROOT / project_id
 
 
 def _wait_job(job_id, timeout=15.0):
@@ -92,7 +103,9 @@ def test_upload_enqueues_transcribe_and_writes_transcript(monkeypatch):
         )
     assert r.status_code == 200
     body = r.json()
-    assert body["id"] == body["job_id"]
+    assert body["project_id"] == pid
+    assert body["job_id"]
+    assert _project_dir(body["project_id"]).is_dir()
     assert body["media"]["width"] == 320
     assert recorded["model"] == "turbo"
 
@@ -203,6 +216,20 @@ def test_approve_unknown_script_404():
     (pdir / "transcript.json").write_text("[]")
     (pdir / "scripts.json").write_text("[]")
     r = client.post(f"/api/projects/{pid}/approve", json={"script_id": "nope"})
+    assert r.status_code == 404
+
+
+def test_approve_missing_generation_404():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    r = client.post(f"/api/projects/{pid}/approve", json={"script_id": "s1"})
+    assert r.status_code == 404
+    assert "generated yet" in r.json()["detail"]
+
+
+def test_path_traversal_project_rejected():
+    client = TestClient(create_app())
+    r = client.get("/api/projects/%2e%2e/scripts")
     assert r.status_code == 404
 
 
