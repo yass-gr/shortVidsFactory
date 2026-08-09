@@ -11,8 +11,8 @@
 ## Global Constraints
 
 - All media processing must go through local ffmpeg/ffprobe (system binaries); no Python video libs.
-- AI output via local `opencode run --format json <prompt> --dir <projects/<id>>`; a `--model` flag is passed only if env `SHORTVIDS_OPENSE_MODEL` is set. Never use cloud LLM APIs.
-- Transcription via `faster-whisper` running on CPU; model name from env `SHORTVIDS_WHISPER_MODEL`, default `"base"`.
+- AI output via local `opencode run --format json <prompt> --dir <projects/<id>>`; a `--model` flag is passed only if env `SHORTSVIDS_OPENCODE_MODEL` is set. Never use cloud LLM APIs.
+- Transcription via `faster-whisper` running on CPU; model name from env `SHORTSVIDS_WHISPER_MODEL`, default `"base"`.
 - Final export is H.264 + AAC, container MP4, 1080×1920 (9:16), captions burned in (Style A — always match real spoken words), no title burn-in.
 - Preview quality: 540-pixel-wide on-demand MP4 rebuilt only when cuts change. No live frame-accurate scrubbing.
 - Scripts must be self-contained, interesting, SFW, and teaser by pulling only from actual spoken content; output must conform to the strict JSON schema (validated server-side).

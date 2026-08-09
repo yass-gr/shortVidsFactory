@@ -35,7 +35,7 @@ def _get_client():
 def _transcribe_job(args: dict):
     project_id = args["project_id"]
     pdir = project_dir(project_id)
-    model = os.environ.get("SHORTVIDS_WHISPER_MODEL", "base")
+    model = os.environ.get("SHORTSVIDS_WHISPER_MODEL", "base")
     transcriber = Transcriber(model=model)
     words = transcriber.transcribe(str(pdir / "source.mp4"))
     data = [w.model_dump() for w in words]

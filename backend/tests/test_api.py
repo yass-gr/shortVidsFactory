@@ -95,7 +95,7 @@ def test_upload_enqueues_transcribe_and_writes_transcript(monkeypatch):
 
     monkeypatch.setattr(api_mod, "Transcriber", RecordingTranscriber)
     monkeypatch.setattr(api_mod, "build_proxy", lambda source, proxy: source)
-    monkeypatch.setenv("SHORTVIDS_WHISPER_MODEL", "turbo")
+    monkeypatch.setenv("SHORTSVIDS_WHISPER_MODEL", "turbo")
 
     with CLIP.open("rb") as f:
         r = client.post(
@@ -120,6 +120,27 @@ def test_upload_enqueues_transcribe_and_writes_transcript(monkeypatch):
         {"start": 0.0, "end": 0.5, "text": "hello"},
         {"start": 0.5, "end": 1.0, "text": "world"},
     ]
+
+
+def test_transcribe_reads_shortsids_whisper_model(monkeypatch):
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    recorded = {}
+
+    class RecordingTranscriber(FakeTranscriber):
+        def __init__(self, model="base"):
+            super().__init__(model)
+            recorded["model"] = model
+
+    monkeypatch.setattr(api_mod, "Transcriber", RecordingTranscriber)
+    monkeypatch.setattr(api_mod, "build_proxy", lambda source, proxy: source)
+    monkeypatch.setenv("SHORTSVIDS_WHISPER_MODEL", "small")
+
+    r = client.post(f"/api/projects/{pid}/transcribe", json={})
+    assert r.status_code == 200
+    job = _wait_job(r.json()["job_id"])
+    assert job.status == JobStatus.done
+    assert recorded["model"] == "small"
 
 
 def test_retranscribe_enqueues_again(monkeypatch):
