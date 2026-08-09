@@ -96,6 +96,33 @@ describe('Scripts', () => {
     })
   })
 
+  it('recovers from an errored pending job via Retry by regenerating', async () => {
+    api.getScripts.mockResolvedValueOnce({ pending: 'old-errored-job' })
+    api.getScripts.mockResolvedValue({ pending: null })
+    api.generateScripts.mockResolvedValue({ job_id: 'j3' })
+    api.pollJob.mockImplementation((jobId, onProgress) => {
+      if (jobId === 'old-errored-job') {
+        onProgress({ status: 'error', progress: 1, error: 'Script generation failed' })
+      } else {
+        onProgress({ status: 'done', progress: 1, result: SCRIPTS })
+      }
+      return { close: vi.fn() }
+    })
+    renderScripts()
+
+    await waitFor(() => {
+      expect(api.pollJob).toHaveBeenCalledWith('old-errored-job', expect.any(Function))
+    })
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+    expect(screen.getByText('Script generation failed')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+
+    await waitFor(() => expect(screen.getByText('Hook one')).toBeTruthy())
+    expect(api.generateScripts).toHaveBeenCalledWith('p1')
+    expect(api.pollJob).toHaveBeenCalledWith('j3', expect.any(Function))
+  })
+
   it('shows an error with a Retry that re-triggers generation', async () => {
     api.getScripts.mockRejectedValueOnce(new Error('network down'))
     api.getScripts.mockResolvedValue({ pending: null })
