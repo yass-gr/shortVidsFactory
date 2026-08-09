@@ -16,11 +16,6 @@ const CUTS = [
   { source_start: 20, source_end: 25, caption_lines: [] },
 ]
 
-const OVERLAPPING = [
-  { source_start: 0, source_end: 12, caption_lines: [] },
-  { source_start: 10, source_end: 20, caption_lines: [] },
-]
-
 const state = (selectedId = null) => ({ cuts: CUTS, selectedId })
 
 describe('useTimelineReducer', () => {
@@ -53,16 +48,19 @@ describe('useTimelineReducer', () => {
       expect(next.cuts[0].source_end).toBe(4)
     })
 
-    it('does not allow a left trim past the previous cut boundary', () => {
-      const s = { cuts: OVERLAPPING, selectedId: null }
-      const next = timelineReducer(s, trimCut(1, 'left', 5))
-      expect(next.cuts[1].source_start).toBe(12)
+    it('lets a duplicated copy be trimmed on its left edge (duplicate then trim)', () => {
+      const dup = timelineReducer(state(), duplicateCut(0))
+      const next = timelineReducer(dup, trimCut(1, 'left', 2))
+      expect(next.cuts).toHaveLength(4)
+      expect(next.cuts[1].source_start).toBe(2)
+      expect(next.cuts[1].source_end).toBe(4)
     })
 
-    it('does not allow a right trim past the next cut boundary', () => {
-      const s = { cuts: OVERLAPPING, selectedId: null }
-      const next = timelineReducer(s, trimCut(0, 'right', 18))
-      expect(next.cuts[0].source_end).toBe(10)
+    it('lets the original be trimmed on its right edge after duplication (duplicate then trim)', () => {
+      const dup = timelineReducer(state(), duplicateCut(0))
+      const next = timelineReducer(dup, trimCut(0, 'right', 3))
+      expect(next.cuts[0].source_start).toBe(0)
+      expect(next.cuts[0].source_end).toBe(3)
     })
 
     it('refuses to collapse a cut to zero length', () => {
@@ -247,5 +245,19 @@ describe('Timeline', () => {
     const selected = screen.getByTestId('timeline-cut-0')
     const other = screen.getByTestId('timeline-cut-1')
     expect(selected.style.border).not.toBe(other.style.border)
+  })
+
+  it('cannot delete the last remaining cut', () => {
+    const h = handlers()
+    render(<Timeline cuts={[CUTS[0]]} selectedId={0} {...h} />)
+    expect(screen.getByRole('button', { name: /delete/i }).disabled).toBe(true)
+    fireEvent.keyDown(screen.getByTestId('timeline'), { key: 'Delete' })
+    expect(h.onDelete).not.toHaveBeenCalled()
+  })
+
+  it('focuses the timeline when a cut is clicked so Delete keys are dependable', () => {
+    render(<Timeline cuts={CUTS} selectedId={null} {...handlers()} />)
+    fireEvent.click(screen.getByTestId('timeline-cut-0'))
+    expect(document.activeElement).toBe(screen.getByTestId('timeline'))
   })
 })

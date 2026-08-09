@@ -34,19 +34,15 @@ export function timelineReducer(state, action) {
     case 'trim': {
       const { index, which, boundary } = action
       if (!cuts[index] || Number.isNaN(boundary)) return state
-      const prev = cuts[index - 1]
-      const next = cuts[index + 1]
       const trimmed = cuts.map((cut, i) => {
         if (i !== index) return cut
         if (which === 'left') {
-          const lower = Math.max(cut.source_start, prev ? prev.source_end : cut.source_start)
-          const newStart = clamp(boundary, lower, cut.source_end)
+          const newStart = clamp(boundary, cut.source_start, cut.source_end)
           if (newStart >= cut.source_end) return cut
           return { ...cut, source_start: newStart }
         }
         if (which === 'right') {
-          const upper = Math.min(cut.source_end, next ? next.source_start : cut.source_end)
-          const newEnd = clamp(boundary, cut.source_start, upper)
+          const newEnd = clamp(boundary, cut.source_start, cut.source_end)
           if (newEnd <= cut.source_start) return cut
           return { ...cut, source_end: newEnd }
         }

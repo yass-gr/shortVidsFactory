@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import App from '../App.jsx'
 import * as api from '../api.js'
 
@@ -18,5 +18,11 @@ describe('App', () => {
     render(<App initialRoute="/project/p1/editor" />)
     expect(screen.getByRole('heading', { name: 'Editor' })).toBeTruthy()
     expect(document.querySelector('video').getAttribute('src')).toContain('/api/projects/p1/preview.mp4')
+  })
+
+  it('shows the selected-cut readout after clicking a timeline block', () => {
+    render(<App initialRoute="/project/p1/editor" />)
+    fireEvent.click(screen.getByTestId('timeline-cut-1'))
+    expect(screen.getByTestId('editor-selected').textContent).toContain('Selected cut 2')
   })
 })

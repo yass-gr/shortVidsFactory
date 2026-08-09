@@ -68,8 +68,10 @@ export default function Timeline({
     dragFrom.current = null
   }
 
+  const canDelete = selectedId !== null && cuts.length > 1
+
   function handleKeyDown(e) {
-    if (e.key === 'Delete' && selectedId !== null) {
+    if (e.key === 'Delete' && canDelete) {
       e.preventDefault()
       onDelete(selectedId)
     }
@@ -87,7 +89,7 @@ export default function Timeline({
         </button>
         <button
           type="button"
-          disabled={selectedId === null}
+          disabled={!canDelete}
           onClick={() => onDelete(selectedId)}
         >
           Delete
@@ -116,7 +118,10 @@ export default function Timeline({
               onDragOver={allowDrop}
               onDrop={(e) => finishReorder(e, index)}
               onDragEnd={finishReorderCancel}
-              onClick={() => onSelect(index)}
+              onClick={() => {
+                trackRef.current?.focus()
+                onSelect(index)
+              }}
               style={{
                 position: 'relative',
                 flexGrow: Math.max(duration(cut), MIN_FLEX_GROW),
