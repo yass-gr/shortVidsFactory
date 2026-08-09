@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Projects from './pages/Projects.jsx'
+import Scripts from './pages/Scripts.jsx'
 import Upload from './pages/Upload.jsx'
 
 const findProjectRoute = (route) => {
@@ -29,7 +30,7 @@ export default function App({ initialRoute = '/' }) {
   if (route === '/new') {
     page = <Upload onNavigate={navigate} />
   } else if (projectRoute && projectRoute.page === 'scripts') {
-    page = <ComingSoon title="Scripts" projectId={projectRoute.projectId} />
+    page = <Scripts projectId={projectRoute.projectId} navigate={navigate} />
   } else if (projectRoute && projectRoute.page === 'editor') {
     page = <ComingSoon title="Editor" projectId={projectRoute.projectId} />
   } else {
