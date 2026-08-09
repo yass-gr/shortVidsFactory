@@ -1,6 +1,6 @@
 # ShortVidsFactory Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a local web app that automates short-video creation: upload a video, transcribe it locally, generate 3 candidate 15–30s vertical scripts with an AI agent, approve one, edit cuts/captions/music in a CapCut-style timeline, and export a 9:16 1080×1920 MP4 with burned-in captions.
 
@@ -35,7 +35,7 @@
 - Consumes: nothing.
 - Produces: `app/main.py` exposes `create_app() -> FastAPI` with `GET /api/health -> {"status": "ok"}`. Backend importable as `from app.main import create_app`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `backend/tests/test_health.py`:
 ```python
@@ -49,12 +49,12 @@ def test_health():
     assert r.json() == {"status": "ok"}
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd backend && pytest tests/test_health.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app'`.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `backend/pyproject.toml`:
 ```toml
@@ -95,12 +95,12 @@ app = create_app()
 
 `backend/app/__init__.py` — empty file.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd backend && pip install -e . && pytest tests/test_health.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -125,7 +125,7 @@ git commit -m "feat(backend): scaffold FastAPI app with health endpoint"
   - `path_escaped(path: Path) -> str` — quotes a path for safe use inside ffmpeg filter_complex.
 - `app/config.py` (created) exports `PROJECTS_ROOT: Path` (`./projects`) — grows in later tasks.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 `backend/tests/test_media.py`:
 ```python
@@ -139,7 +139,7 @@ def test_probe_returns_dimensions_and_duration():
     assert abs(info["duration_s"] - 3.0) < 0.5
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd backend && pytest tests/test_media.py -v`
 Expected: FAIL — no `app.media`.
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `backend/app/media.py`:
 ```python
@@ -208,12 +208,12 @@ def build_proxy(source: Path, proxy: Path, width: int = 540) -> Path:
     return proxy
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd backend && python fixtures/make_fixture.py && pytest tests/test_media.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -233,7 +233,7 @@ git commit -m "feat(media): ffprobe harness and proxy builder with fixtures"
 - Produces: `build_preview(track: list[dict], out_path: Path) -> Path` — waits than consuming browser: `track` is an ordered list of `{"source_start": float, "source_end": float}` in seconds, all referencing one source file (handed as `source_path`).
 - Signature: `build_preview(source: Path, track: list[dict], out_path: Path, width: int = 540) -> Path`.
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `backend/tests/test_preview.py`:
 ```python
@@ -254,12 +254,12 @@ def test_preview_concats_two_cuts():
     out.unlink(missing_ok=True)
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd backend && pytest tests/test_preview.py -v`
 Expected: FAIL — no `app.preview`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/preview.py`:
 ```python
@@ -290,12 +290,12 @@ def build_preview(source: Path, track: list[dict], out_path: Path, width: int = 
     return out_path
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd backend && pytest tests/test_preview.py -v`
 Expected: PASS (duration ≈ 2.0s ± 0.6).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -318,7 +318,7 @@ git commit -m "feat(backend): concatenated preview builder from cuts"
   - `Transcriber(model_size: str = "base", device: str = "cpu")`.
   - Constructor must accept an `engine=None` injectable to allow fake-transcription tests (defaults to `faster_whisper.WhisperModel`).
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `backend/tests/test_transcribe.py`:
 ```python
@@ -343,12 +343,12 @@ def test_transcriber_with_fake_engine():
 
 (Ignore the `words` iterable detail — final FakeEngine uses a simple 4-word list.)
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_transcribe.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/transcribe.py`:
 ```python
@@ -394,12 +394,12 @@ class FakeEngine:
 ```
 where `SegmentEmula` has `words` iterating objects with `start/end/word`.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_transcribe.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -422,7 +422,7 @@ git commit -m "feat(backend): faster-whisper transcription with word timestamps"
   - `InvalidAIOutput` exception with readable message.
   - env read: `SHORTSVIDS_OPENCODE_MODEL` → if set, append `--model <value>`. `SHORTSVIDS_OPENCODE_BIN` → binary name, default `"opencode"`.
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `backend/tests/test_ai.py`:
 ```python
@@ -441,12 +441,12 @@ def test_extract_json_blocks_errors_when_missing():
         pass
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_ai.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/ai.py`:
 ```python
@@ -490,12 +490,12 @@ class OpenCodeClient:
         return out.stdout
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_ai.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -518,7 +518,7 @@ git commit -m "feat(backend): opencode CLI runner and JSON extraction"
   - `validate_script_candidates(raw: list[dict], transcript: list[dict], max_duration: float = 30.0) -> list[Script]` — rejects scripts not in range, cuts that exceed transcript boundaries, and enforces captions inside cut range; raises `InvalidScript` on structural errors.
   - `config.py`: `PROJECTS_ROOT: Path = Path("projects")` and helper `project_dir(project_id: str) -> Path`.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 `backend/tests/test_scripts.py`:
 ```python
@@ -551,12 +551,12 @@ def test_script_too_long_rejected():
         pass
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_scripts.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/config.py`:
 ```python
@@ -617,12 +617,12 @@ def validate_script_candidates(raw: list[dict], transcript: list[dict], max_dura
     return scripts
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_scripts.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -644,7 +644,7 @@ git commit -m "feat(backend): script schema and validation"
   - `generate_scripts(client: OpenCodeClient, project_id: str, transcript: list[dict], duration_s: float) -> list[Script]` — writes prompt X to a file, calls client, extracts JSON, validates, returns scripts.
   - `transcript_to_prompt(transcript: list[dict]) -> str` — word-list as `"0.00-0.50 one | 0.50-1.00 two"`.
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `backend/tests/test_scriptwriter.py`:
 ```python
@@ -661,12 +661,12 @@ def test_prompt_constraints_embedded():
 
 Second: a fake client returning candidate payload → `generate_scripts` returns validated list. Provide a small fake that returns the correct cut JSON fenced in a single JSON block.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_scriptwriter.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/scriptwriter.py`:
 ```python
@@ -710,12 +710,12 @@ def generate_scripts(client: OpenCodeClient, project_id: str,
     return validate_script_candidates(candidates, transcript)
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_scriptwriter.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -741,7 +741,7 @@ git commit -m "feat(backend): script-writing agent prompt + orchestration"
     - `event_stream(job_id) -> Iterator[str]` (SSE `text/event-stream`, emits one event per status/progress change and a final `done`/`error` event with `result`/`error`).
   - The API layer consumes `manager` and mounts `GET /api/jobs/{id}/stream`.
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 `backend/tests/test_jobs.py`:
 ```python
@@ -760,12 +760,12 @@ def test_job_runs_and_stores_result():
     assert manager.get(job.id).result == {"total": 42}
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_jobs.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/jobs.py`:
 ```python
@@ -855,9 +855,9 @@ class _JobManager:
 manager = _JobManager()
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -890,7 +890,7 @@ git commit -m "feat(backend): background job manager with SSE progress"
   - `POST /api/projects/{id}/export` — body `{destination: Path}`; enqueues job `export` (built Task 11); returns `{"job_id"}`.
 - All job endpoints accept async streams: mount `GET /api/jobs/{id}/stream` → SSE via `StreamingResponse`.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 `backend/tests/test_api.py`:
 ```python
@@ -906,21 +906,21 @@ def test_create_project():
     assert body["id"].startswith("p")
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_api.py -v`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement** (main.py mounts `app/api.py` router; api.py wires the job functions; keep SSE minimal but functional in this task; export job is stubbed to return `{"exported": true}` until Task 11).
+- [x] **Step 3: Implement** (main.py mounts `app/api.py` router; api.py wires the job functions; keep SSE minimal but functional in this task; export job is stubbed to return `{"exported": true}` until Task 11).
 
 Note: avoid blocking transcribe in-request; always enqueue; tests for transcribe can mock `Transcriber`.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_api.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -942,7 +942,7 @@ git commit -m "feat(backend): project storage, upload, script, snapshot, SSE API
   - `new_snapshot(project_id, script: Script) -> EditorSnapshot` — builds cuts from a chosen script; music default None, font `"Arial"`.
   - `serialize(snap) -> dict`, `deserialize(d) -> EditorSnapshot` (Pydantic handles).
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 `backend/tests/test_editor.py`:
 ```python
@@ -973,12 +973,12 @@ def test_snapshot_can_roundtrip():
     assert again == snap
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_editor.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.editor'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/editor.py`:
 ```python
@@ -1008,12 +1008,12 @@ def new_snapshot(project_id: str, script: Script) -> EditorSnapshot:
     return EditorSnapshot(cuts=[c.model_copy(deep=True) for c in script.cuts])
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_editor.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/
@@ -1086,7 +1086,7 @@ def _fmt(seconds: float) -> str:  # h:mm:ss.cs
 - `music is None or music_path is None` → copy `plain_video` to `out` unchanged.
 - else: input `[0]plain_video [1]music_path`; `[1:a]atrim=start=<trim_start>:end=<trim_end>,asetpts=PTS-STARTPTS,volume=<volume>[bgm]`; if duck: `[bgm][0:a]sidechaincompress=threshold=0.05:ratio=8:attack=20:release=500[bgmd];[0:a][bgmd]amix=inputs=2:duration=first:dropout_transition=0[a]` else avoid ducking with `[bgm][0:a]amix=inputs=2:duration=first:dropout_transition=0[a]`; `-map 0:v -map "[a]"` + `-c:v copy -c:a aac`.
 
-- [ ] **Test** (`tests/test_export.py`):
+- [x] **Test** (`tests/test_export.py`):
 ```python
 def test_export_produces_vertical_h264(tmp_path):
     snap = new_snapshot("p1", FIXTURE_2S)
@@ -1095,7 +1095,7 @@ def test_export_produces_vertical_h264(tmp_path):
     assert info["width"] == 1080 and info["height"] == 1920
     assert info["duration_s"] == approx(2.0, abs=0.5)
 ```
-- [ ] Full TDD churn with passes before commit.
+- [x] Full TDD churn with passes before commit.
 
 ---
 
@@ -1114,7 +1114,7 @@ def test_export_produces_vertical_h264(tmp_path):
 - `class CombinedMusicSource` — tries social first, falls back to local; used by routes.
 - Route `GET /api/music` returns `{uses_local: true, tracks: [...], social: false}`.
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 `backend/tests/test_music.py`:
 ```python
@@ -1155,12 +1155,12 @@ def test_combined_degrades_to_local(tmp_path):
     assert len(combined.list_tracks()) == 1
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd backend && pytest tests/test_music.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'app.music'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `backend/app/music.py`:
 ```python
@@ -1241,12 +1241,12 @@ class CombinedMusicSource(MusicSource):
         raise MusicUnavailable(f"Unknown track: {track_id}")
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `cd backend && pytest tests/test_music.py -v`
 Expected: PASS.
 
-- [ ] **Step 5: Wire route (minimal)**
+- [x] **Step 5: Wire route (minimal)**
 
 In `backend/app/api.py`, add `GET /api/music`:
 ```python
@@ -1272,7 +1272,7 @@ def list_music():
     }
 ```
 
-- [ ] **Step 6: Add route test & run full suite**
+- [x] **Step 6: Add route test & run full suite**
 
 Extend `backend/tests/test_api.py`:
 ```python
@@ -1289,7 +1289,7 @@ def test_music_list(tmp_path, monkeypatch):
 
 Run: `cd backend && pytest` — Expected: ALL PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add backend/
@@ -1315,7 +1315,7 @@ git commit -m "feat(backend): music sources with local + social fallback"
   - `apiFetch(path, opts)`, `createProject(name)`, `uploadVideo(projectId, file)`, `pollJob(jobId, onProgress)` (uses EventSource `/api/jobs/{id}/stream`), `getScripts`, `generateScripts(projectId)`, `approveScript(scriptId)`, `getSnapshot`, `saveSnapshot`, `exportProject`, `getMusic`.
 - Basic `package.json` scripts: `dev`, `build`, `test`.
 
-- [ ] **Step 1–5**: TDD: render App, health call mocked; assert heading renders. Run `npm install`, `npm run test`, `npm run dev`.
+- [x] **Step 1–5**: TDD: render App, health call mocked; assert heading renders. Run `npm install`, `npm run test`, `npm run dev`.
 
 ---
 
@@ -1408,7 +1408,7 @@ Structure:
 **Behavior details:**
 - Frontend `api.js` adds `revealDirectory(projectId)` → POST `{id}/reveal`.
 
-- [ ] **Steps** run the same TDD loop: first add `open_destination` + `_reveal` route with a test asserting the route calls `xdg-open`-guarded subprocess (mock `subprocess.run` — assert called with `["xdg-open", <path>]`), then wire the button to `revealDirectory`.
+- [x] **Steps** run the same TDD loop: first add `open_destination` + `_reveal` route with a test asserting the route calls `xdg-open`-guarded subprocess (mock `subprocess.run` — assert called with `["xdg-open", <path>]`), then wire the button to `revealDirectory`.
 
 Note: verify `xdg-open` availability on the target desktop before wiring the button; if missing, hide it.
 
