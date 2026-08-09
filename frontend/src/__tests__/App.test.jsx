@@ -5,6 +5,18 @@ import * as api from '../api.js'
 
 vi.mock('../api.js', () => ({
   listProjects: vi.fn(() => Promise.resolve({ projects: [] })),
+  getSnapshot: vi.fn(() =>
+    Promise.resolve({
+      cuts: [
+        { source_start: 0, source_end: 1, caption_lines: [{ start: 0, end: 1, text: 'One' }] },
+        { source_start: 1, source_end: 2, caption_lines: [{ start: 1, end: 2, text: 'Two' }] },
+      ],
+      music: null,
+      font: 'Arial',
+      export_path: '',
+    }),
+  ),
+  getMusic: vi.fn(() => Promise.resolve({ tracks: [], social: false, uses_local: true })),
 }))
 
 describe('App', () => {
@@ -14,14 +26,16 @@ describe('App', () => {
     await waitFor(() => expect(api.listProjects).toHaveBeenCalled())
   })
 
-  it('renders the editor page with the preview player for /project/:id/editor', () => {
+  it('renders the editor page with the preview player for /project/:id/editor', async () => {
     render(<App initialRoute="/project/p1/editor" />)
     expect(screen.getByRole('heading', { name: 'Editor' })).toBeTruthy()
     expect(document.querySelector('video').getAttribute('src')).toContain('/api/projects/p1/preview.mp4')
+    await waitFor(() => expect(api.getSnapshot).toHaveBeenCalled())
   })
 
-  it('shows the selected-cut readout after clicking a timeline block', () => {
+  it('shows the selected-cut readout after clicking a timeline block', async () => {
     render(<App initialRoute="/project/p1/editor" />)
+    await waitFor(() => expect(screen.getByTestId('timeline-cut-1')).toBeTruthy())
     fireEvent.click(screen.getByTestId('timeline-cut-1'))
     expect(screen.getByTestId('editor-selected').textContent).toContain('Selected cut 2')
   })

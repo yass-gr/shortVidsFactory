@@ -7,6 +7,8 @@ import {
   reorderCut,
   duplicateCut,
   deleteCut,
+  replaceCuts,
+  updateCutCaptions,
 } from '../editor/useTimelineReducer.js'
 import Timeline from '../editor/Timeline.jsx'
 
@@ -146,6 +148,34 @@ describe('useTimelineReducer', () => {
 
     it('is a no-op when the index is out of range', () => {
       const next = timelineReducer(state(), deleteCut(null))
+      expect(next.cuts).toBe(CUTS)
+    })
+  })
+
+  describe('replace', () => {
+    it('replaces all cuts and clears the selection', () => {
+      const next = timelineReducer(state(1), replaceCuts([CUTS[2]]))
+      expect(next.cuts).toEqual([CUTS[2]])
+      expect(next.selectedId).toBeNull()
+    })
+
+    it('accepts an empty cut list', () => {
+      const next = timelineReducer(state(), replaceCuts([]))
+      expect(next.cuts).toEqual([])
+      expect(next.selectedId).toBeNull()
+    })
+  })
+
+  describe('captions', () => {
+    it('updates the caption_lines of the target cut', () => {
+      const lines = [{ start: 0, end: 4, text: 'New' }]
+      const next = timelineReducer(state(), updateCutCaptions(0, lines))
+      expect(next.cuts[0].caption_lines).toEqual(lines)
+      expect(next.cuts[1]).toBe(CUTS[1])
+    })
+
+    it('is a no-op when the index is out of range', () => {
+      const next = timelineReducer(state(), updateCutCaptions(99, []))
       expect(next.cuts).toBe(CUTS)
     })
   })

@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import Preview from '../editor/Preview.jsx'
 import Timeline from '../editor/Timeline.jsx'
+import Inspector from '../editor/Inspector.jsx'
+import { getSnapshot, saveSnapshot } from '../api.js'
 import {
   useTimelineReducer,
   selectCut,
@@ -7,25 +10,48 @@ import {
   reorderCut,
   duplicateCut,
   deleteCut,
+  replaceCuts,
+  updateCutCaptions,
 } from '../editor/useTimelineReducer.js'
 
-const DEMO_CUTS = [
-  {
-    source_start: 0,
-    source_end: 1,
-    caption_lines: [{ start: 0, end: 1, text: 'Demo cut one' }],
-  },
-  {
-    source_start: 1,
-    source_end: 2,
-    caption_lines: [{ start: 1, end: 2, text: 'Demo cut two' }],
-  },
-]
+const DEFAULT_FONT = 'Arial'
 
 export default function Editor({ projectId }) {
-  const [state, dispatch] = useTimelineReducer(DEMO_CUTS)
+  const [state, dispatch] = useTimelineReducer([])
+  const [font, setFont] = useState(DEFAULT_FONT)
+  const [music, setMusic] = useState(null)
+  const [exportPath, setExportPath] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
+
   const { cuts, selectedId } = state
   const selected = selectedId !== null ? cuts[selectedId] : null
+
+  useEffect(() => {
+    let active = true
+    getSnapshot(projectId)
+      .then((snap) => {
+        if (!active) return
+        dispatch(replaceCuts(snap.cuts || []))
+        setFont(snap.font || DEFAULT_FONT)
+        setMusic(snap.music ?? null)
+        setExportPath(snap.export_path || '')
+      })
+      .catch(() => {
+        // No snapshot yet (404) or backend unavailable: fall back to defaults.
+      })
+    return () => {
+      active = false
+    }
+  }, [projectId])
+
+  function handleSave() {
+    setSaving(true)
+    setSaveError(null)
+    saveSnapshot(projectId, { cuts, music, font, export_path: exportPath })
+      .catch((err) => setSaveError(err.message))
+      .finally(() => setSaving(false))
+  }
 
   return (
     <main>
@@ -39,6 +65,18 @@ export default function Editor({ projectId }) {
         onReorder={(from, to) => dispatch(reorderCut(from, to))}
         onDuplicate={(index) => dispatch(duplicateCut(index))}
         onDelete={(index) => dispatch(deleteCut(index))}
+      />
+      <Inspector
+        cut={selected}
+        font={font}
+        music={music}
+        onCaptionChange={(lines) => dispatch(updateCutCaptions(selectedId, lines))}
+        onFontChange={setFont}
+        onMusicChange={setMusic}
+        onMusicClear={() => setMusic(null)}
+        onSave={handleSave}
+        saving={saving}
+        saveError={saveError}
       />
       {selected && (
         <p data-testid="editor-selected">

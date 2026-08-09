@@ -22,6 +22,14 @@ export function deleteCut(index) {
   return { type: 'delete', index }
 }
 
+export function replaceCuts(cuts) {
+  return { type: 'replace', cuts }
+}
+
+export function updateCutCaptions(index, captionLines) {
+  return { type: 'captions', index, captionLines }
+}
+
 export function timelineReducer(state, action) {
   const { cuts, selectedId } = state
   switch (action.type) {
@@ -91,6 +99,17 @@ export function timelineReducer(state, action) {
         nextSelectedId = Math.min(index, nextCuts.length - 1)
       }
       return { cuts: nextCuts, selectedId: nextSelectedId }
+    }
+
+    case 'replace': {
+      return { cuts: action.cuts, selectedId: null }
+    }
+
+    case 'captions': {
+      const { index, captionLines } = action
+      if (index === null || index < 0 || index >= cuts.length) return state
+      const nextCuts = cuts.map((cut, i) => (i === index ? { ...cut, caption_lines: captionLines } : cut))
+      return { ...state, cuts: nextCuts }
     }
 
     default:
