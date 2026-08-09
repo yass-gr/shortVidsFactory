@@ -49,3 +49,17 @@ def test_caption_outside_cut_rejected():
                       "caption_lines": [{"start": 0.0, "end": 2.0, "text": "hello"}]}]}]
     with pytest.raises(ValueError):
         validate_script_candidates(raw, TRANSCRIPT)
+
+def test_negative_source_start_rejected():
+    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 16.0,
+            "words_used": 1,
+            "cuts": [{"source_start": -0.1, "source_end": 1.0, "caption_lines": []}]}]
+    with pytest.raises(ValueError):
+        validate_script_candidates(raw, TRANSCRIPT)
+
+def test_below_floor_duration_rejected():
+    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 12.0,
+            "words_used": 1,
+            "cuts": [{"source_start": 0.0, "source_end": 1.0, "caption_lines": []}]}]
+    with pytest.raises(ValueError):
+        validate_script_candidates(raw, TRANSCRIPT)
