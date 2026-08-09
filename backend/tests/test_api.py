@@ -281,3 +281,14 @@ def test_job_stream_unknown_job_404():
     client = TestClient(create_app())
     r = client.get("/api/jobs/garbageid/stream")
     assert r.status_code == 404
+
+
+def test_music_list(tmp_path, monkeypatch):
+    monkeypatch.setenv("SHORTSVIDS_MUSIC_DIR", str(tmp_path))
+    (tmp_path / "a.mp3").write_bytes(b"\x00")
+    client = TestClient(create_app())
+    r = client.get("/api/music")
+    body = r.json()
+    assert len(body["tracks"]) == 1
+    assert body["tracks"][0]["title"] == "a.mp3"
+    assert body["social"] is False

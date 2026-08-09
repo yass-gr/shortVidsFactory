@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from .config import PROJECT_ROOT, project_dir
 from .jobs import manager
 from .media import build_proxy, probe
+from .music import CombinedMusicSource, LocalFilesMusicSource, SocialExtractorMusicSource
 from .scriptwriter import generate_scripts
 from .scripts import validate_script_candidates
 from .storage import create_project, load_json, save_json
@@ -65,6 +66,27 @@ def _require_project(project_id: str) -> Path:
     if not pdir.is_dir():
         raise HTTPException(status_code=404, detail="Project not found")
     return pdir
+
+
+def _music_source():
+    return CombinedMusicSource(
+        social=SocialExtractorMusicSource(),
+        local=LocalFilesMusicSource(),
+    )
+
+
+@router.get("/music")
+def list_music():
+    tracks = _music_source().list_tracks()
+    return {
+        "tracks": [
+            {"id": t.id, "title": t.title, "source": t.source,
+             "path": str(t.path) if t.path else None}
+            for t in tracks
+        ],
+        "social": False,
+        "uses_local": True,
+    }
 
 
 # --- project routes ----------------------------------------------------------
