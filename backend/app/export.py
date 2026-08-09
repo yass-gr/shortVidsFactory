@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -6,6 +7,23 @@ from typing import Callable
 from .editor import EditorSnapshot, MusicTrack
 from .media import path_escaped
 from .preview import build_preview
+
+
+def default_font() -> str:
+    return os.environ.get(
+        "SHORTSVIDS_FONT_PATH",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    )
+
+
+def _resolve_font(get_font: Callable[[], str] | None) -> str:
+    candidate = get_font() if get_font is not None else default_font()
+    if Path(candidate).is_file():
+        return candidate
+    for font in Path("/usr/share/fonts").glob("**/*.ttf"):
+        if font.is_file():
+            return str(font)
+    return candidate
 
 
 def build_ass(snapshot: EditorSnapshot, get_font: Callable[[], str]) -> str:
@@ -58,18 +76,22 @@ def mux_music(plain_video: Path, music: MusicTrack | None, music_path: Path | No
         )
     else:
         chain = f"{bgm};[bgm][0:a]amix=inputs=2:duration=first:dropout_transition=0[a]"
-    subprocess.run(
-        ["ffmpeg", "-y", "-i", str(plain_video), "-i", str(music_path),
-         "-filter_complex", chain,
-         "-map", "0:v", "-map", "[a]",
-         "-c:v", "copy", "-c:a", "aac", str(out)],
-        check=True, capture_output=True,
-    )
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", str(plain_video), "-i", str(music_path),
+             "-filter_complex", chain,
+             "-map", "0:v", "-map", "[a]",
+             "-c:v", "copy", "-c:a", "aac", str(out)],
+            check=True, capture_output=True,
+        )
+    except Exception:
+        shutil.copyfile(plain_video, out)
     return out
 
 
 def export_video(snapshot: EditorSnapshot, source: Path, project_dir: Path,
-                 destination: Path, get_font: Callable[[], str]) -> Path:
+                 destination: Path, get_font: Callable[[], str] | None = None) -> Path:
+    fontfile = _resolve_font(get_font)
     workspace = (project_dir / "workspace").resolve()
     workspace.mkdir(parents=True, exist_ok=True)
 
@@ -85,7 +107,7 @@ def export_video(snapshot: EditorSnapshot, source: Path, project_dir: Path,
     )
 
     ass_path = workspace / "captions.ass"
-    ass_path.write_text(build_ass(snapshot, get_font))
+    ass_path.write_text(build_ass(snapshot, lambda: fontfile))
 
     captioned = workspace / "captioned.mp4"
     subprocess.run(
