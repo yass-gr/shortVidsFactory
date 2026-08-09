@@ -1,4 +1,6 @@
-from app.scripts import validate_script_candidates, Script
+import pytest
+
+from app.scripts import validate_script_candidates
 
 TRANSCRIPT = [
     {"start": 0.0, "end": 0.5, "text": "one"},
@@ -25,3 +27,25 @@ def test_script_too_long_rejected():
         assert False
     except ValueError:
         pass
+
+def test_cut_exceeding_transcript_rejected():
+    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 16.0,
+            "words_used": 1,
+            "cuts": [{"source_start": 0.0, "source_end": 4.0, "caption_lines": []}]}]
+    with pytest.raises(ValueError):
+        validate_script_candidates(raw, TRANSCRIPT)
+
+def test_empty_cut_rejected():
+    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 16.0,
+            "words_used": 1,
+            "cuts": [{"source_start": 1.0, "source_end": 1.0, "caption_lines": []}]}]
+    with pytest.raises(ValueError):
+        validate_script_candidates(raw, TRANSCRIPT)
+
+def test_caption_outside_cut_rejected():
+    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 16.0,
+            "words_used": 1,
+            "cuts": [{"source_start": 0.0, "source_end": 1.5,
+                      "caption_lines": [{"start": 0.0, "end": 2.0, "text": "hello"}]}]}]
+    with pytest.raises(ValueError):
+        validate_script_candidates(raw, TRANSCRIPT)
