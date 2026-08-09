@@ -18,7 +18,9 @@ export async function apiFetch(path, opts = {}) {
     } catch {
       // keep default detail message
     }
-    throw new Error(detail)
+    const err = new Error(detail)
+    err.status = res.status
+    throw err
   }
   return res.json()
 }

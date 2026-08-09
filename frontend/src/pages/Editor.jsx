@@ -24,12 +24,15 @@ export default function Editor({ projectId }) {
   const [exportPath, setExportPath] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [loadError, setLoadError] = useState(null)
+  const [loadAttempt, setLoadAttempt] = useState(0)
 
   const { cuts, selectedId } = state
   const selected = selectedId !== null ? cuts[selectedId] : null
 
   useEffect(() => {
     let active = true
+    setLoadError(null)
     getSnapshot(projectId)
       .then((snap) => {
         if (!active) return
@@ -38,13 +41,19 @@ export default function Editor({ projectId }) {
         setMusic(snap.music ?? null)
         setExportPath(snap.export_path || '')
       })
-      .catch(() => {
-        // No snapshot yet (404) or backend unavailable: fall back to defaults.
+      .catch((err) => {
+        if (!active) return
+        if (err?.status === 404) return
+        setLoadError(err.message)
       })
     return () => {
       active = false
     }
-  }, [projectId])
+  }, [projectId, loadAttempt])
+
+  function handleReload() {
+    setLoadAttempt((a) => a + 1)
+  }
 
   function handleSave() {
     setSaving(true)
@@ -57,6 +66,14 @@ export default function Editor({ projectId }) {
   return (
     <main>
       <h2>Editor</h2>
+      {loadError && (
+        <div data-testid="editor-load-error" role="alert">
+          <p>Couldn't load your project: {loadError}</p>
+          <button type="button" onClick={handleReload}>
+            Retry
+          </button>
+        </div>
+      )}
       <Preview projectId={projectId} cuts={cuts} />
       <Timeline
         cuts={cuts}

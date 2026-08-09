@@ -73,6 +73,13 @@ describe('api client', () => {
       global.fetch.mockResolvedValue({ ok: false, status: 500, json: () => Promise.reject(new Error('x')) })
       await expect(apiFetch('/api/bad')).rejects.toThrow('Request failed (500)')
     })
+
+    it('attaches the http status to the thrown error', async () => {
+      global.fetch.mockResolvedValue(jsonResponse({ detail: 'nope' }, false, 404))
+      const err = await apiFetch('/api/projects/x/snapshot').catch((e) => e)
+      expect(err.status).toBe(404)
+      expect(err.message).toBe('nope')
+    })
   })
 
   describe('createProject', () => {

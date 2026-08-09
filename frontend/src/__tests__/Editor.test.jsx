@@ -39,12 +39,29 @@ describe('Editor', () => {
   })
 
   it('falls back to empty cuts and default font when the snapshot is absent', async () => {
-    api.getSnapshot.mockRejectedValue(new Error('No snapshot yet'))
+    const err = new Error('No snapshot yet')
+    err.status = 404
+    api.getSnapshot.mockRejectedValue(err)
     render(<Editor projectId="p1" />)
 
     await waitFor(() => expect(api.getSnapshot).toHaveBeenCalled())
     expect(screen.queryByTestId('timeline-cut-0')).toBeNull()
+    expect(screen.queryByTestId('editor-load-error')).toBeNull()
     expect(screen.getByTestId('font-select').value).toBe('Arial')
+  })
+
+  it('shows a load error with Retry when the snapshot request fails', async () => {
+    api.getSnapshot.mockRejectedValueOnce(new Error('backend down'))
+    api.getSnapshot.mockResolvedValueOnce(SNAPSHOT)
+    render(<Editor projectId="p1" />)
+
+    await waitFor(() => expect(screen.getByTestId('editor-load-error')).toBeTruthy())
+    expect(screen.getByText(/backend down/)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+
+    await waitFor(() => expect(screen.getByTestId('timeline-cut-0')).toBeTruthy())
+    expect(api.getSnapshot).toHaveBeenCalledTimes(2)
   })
 
   it('keeps the refreshed export path after a successful export when saving', async () => {
