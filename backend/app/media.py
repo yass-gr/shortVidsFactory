@@ -27,6 +27,10 @@ def build_proxy(source: Path, proxy: Path, width: int = 540) -> Path:
     return proxy
 
 
+def open_destination(path: Path) -> None:
+    subprocess.run(["xdg-open", str(path)], check=False)
+
+
 def path_escaped(path: Path) -> str:
     escaped = path.as_posix().replace("'", "'\\''")
     return f"'{escaped}'"

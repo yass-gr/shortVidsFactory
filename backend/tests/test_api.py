@@ -11,6 +11,7 @@ import app.config as config_mod
 import app.storage as storage_mod
 from app.main import create_app
 from app.jobs import manager, JobStatus
+from app.editor import EditorSnapshot
 from app.transcribe import WordSeg
 
 CLIP = Path(__file__).parent / "fixtures" / "clip_video.mp4"
@@ -294,15 +295,66 @@ def test_preview_missing_source_404():
     assert r.status_code == 404
 
 
-def test_export_job_stub():
+def test_export_job_wired(tmp_path, monkeypatch):
     client = TestClient(create_app())
     pid = _new_project(client)
-    r = client.post(f"/api/projects/{pid}/export", json={"destination": "/tmp/out.mp4"})
+    pdir = _project_dir(pid)
+    storage_mod.save_json(pdir / "editor.json", {
+        "cuts": [{"source_start": 0.0, "source_end": 0.8,
+                  "caption_lines": [{"start": 0.0, "end": 0.8, "text": "hi"}]}],
+        "music": None,
+        "font": "Arial",
+        "export_path": "",
+    })
+
+    seen = {}
+
+    def fake_export(snap, source, project_dir, destination, get_font=None):
+        assert isinstance(snap, EditorSnapshot)
+        seen["destination"] = destination
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(b"mp4")
+        return destination
+
+    monkeypatch.setattr(api_mod, "export_video", fake_export)
+
+    r = client.post(f"/api/projects/{pid}/export", json={"destination": str(tmp_path)})
     assert r.status_code == 200
-    job_id = r.json()["job_id"]
-    job = _wait_job(job_id)
+    job = _wait_job(r.json()["job_id"])
     assert job.kind == "export"
-    assert job.result == {"exported": True}
+    assert job.status == JobStatus.done
+    out = seen["destination"]
+    assert str(out) == str(tmp_path / "shortvids_export.mp4")
+    assert out.exists()
+    assert job.result == {"exported": True, "path": str(out)}
+    editor = json.loads((pdir / "editor.json").read_text())
+    assert editor["export_path"] == str(out)
+
+
+def test_reveal_opens_export_folder(monkeypatch):
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    pdir = _project_dir(pid)
+    storage_mod.save_json(pdir / "editor.json", {
+        "cuts": [], "music": None, "font": "Arial",
+        "export_path": "/tmp/vids/shortvids_export.mp4",
+    })
+    calls = []
+    monkeypatch.setattr("app.media.subprocess.run", lambda args, **kw: calls.append(args))
+    r = client.post(f"/api/projects/{pid}/reveal", json={})
+    assert r.status_code == 200
+    assert r.json() == {"ok": True}
+    assert calls == [["xdg-open", "/tmp/vids"]]
+
+
+def test_reveal_missing_export_path_404():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    storage_mod.save_json(_project_dir(pid) / "editor.json", {
+        "cuts": [], "music": None, "font": "Arial", "export_path": "",
+    })
+    r = client.post(f"/api/projects/{pid}/reveal", json={})
+    assert r.status_code == 404
 
 
 def test_job_stream_emits_sse_events():

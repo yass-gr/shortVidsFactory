@@ -7,8 +7,10 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 from .config import PROJECT_ROOT, project_dir
+from .editor import EditorSnapshot
+from .export import default_font, export_video
 from .jobs import manager
-from .media import build_proxy, probe
+from .media import build_proxy, open_destination, probe
 from .music import CombinedMusicSource, LocalFilesMusicSource, SocialExtractorMusicSource
 from .preview import build_preview
 from .scriptwriter import generate_scripts
@@ -53,7 +55,19 @@ def _scripts_job(args: dict):
 
 
 def _export_job(args: dict):
-    return {"exported": True}
+    project_id = args["project_id"]
+    pdir = _require_project(project_id)
+    snapshot = EditorSnapshot.model_validate(load_json(pdir / "editor.json"))
+    destination = Path(args["destination"])
+    if destination.suffix == ".mp4":
+        out_file = destination
+    else:
+        destination.mkdir(parents=True, exist_ok=True)
+        out_file = destination / "shortvids_export.mp4"
+    export_video(snapshot, pdir / "source.mp4", pdir, out_file, default_font)
+    snapshot.export_path = str(out_file)
+    save_json(pdir / "editor.json", snapshot.model_dump())
+    return {"exported": True, "path": str(out_file)}
 
 
 # --- helpers -----------------------------------------------------------------
@@ -241,6 +255,20 @@ def api_export(project_id: str, body: ExportBody):
     job = manager.submit("export", _export_job,
                          {"project_id": project_id, "destination": body.destination})
     return {"job_id": job.id}
+
+
+@router.post("/projects/{project_id}/reveal")
+def api_reveal(project_id: str, body: _EmptyBody | None = None):
+    pdir = _require_project(project_id)
+    try:
+        snapshot = load_json(pdir / "editor.json")
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="No export yet")
+    export_path = snapshot.get("export_path", "")
+    if not export_path:
+        raise HTTPException(status_code=404, detail="No export yet")
+    open_destination(Path(export_path).parent)
+    return {"ok": True}
 
 
 # --- job routes --------------------------------------------------------------
