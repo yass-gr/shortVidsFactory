@@ -13,4 +13,10 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'ShortVidsFactory' })).toBeTruthy()
     await waitFor(() => expect(api.listProjects).toHaveBeenCalled())
   })
+
+  it('renders the editor page with the preview player for /project/:id/editor', () => {
+    render(<App initialRoute="/project/p1/editor" />)
+    expect(screen.getByRole('heading', { name: 'Editor' })).toBeTruthy()
+    expect(document.querySelector('video').getAttribute('src')).toContain('/api/projects/p1/preview.mp4')
+  })
 })

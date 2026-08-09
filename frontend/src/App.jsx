@@ -2,19 +2,11 @@ import { useState } from 'react'
 import Projects from './pages/Projects.jsx'
 import Scripts from './pages/Scripts.jsx'
 import Upload from './pages/Upload.jsx'
+import Editor from './pages/Editor.jsx'
 
 const findProjectRoute = (route) => {
   const m = route.match(/^\/project\/([^/]+)\/(scripts|editor)$/)
   return m ? { projectId: m[1], page: m[2] } : null
-}
-
-function ComingSoon({ title, projectId }) {
-  return (
-    <main>
-      <h2>{title}</h2>
-      <p>Coming soon (project {projectId}).</p>
-    </main>
-  )
 }
 
 export default function App({ initialRoute = '/' }) {
@@ -32,7 +24,7 @@ export default function App({ initialRoute = '/' }) {
   } else if (projectRoute && projectRoute.page === 'scripts') {
     page = <Scripts projectId={projectRoute.projectId} navigate={navigate} />
   } else if (projectRoute && projectRoute.page === 'editor') {
-    page = <ComingSoon title="Editor" projectId={projectRoute.projectId} />
+    page = <Editor projectId={projectRoute.projectId} />
   } else {
     page = <Projects onNavigate={navigate} />
   }
