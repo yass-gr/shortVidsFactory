@@ -83,6 +83,10 @@ export function exportProject(projectId, destination) {
   return apiFetch(`/api/projects/${projectId}/export`, { method: 'POST', json: { destination } })
 }
 
+export function revealDirectory(projectId) {
+  return apiFetch(`/api/projects/${projectId}/reveal`, { method: 'POST', json: {} })
+}
+
 export function getMusic() {
   return apiFetch('/api/music')
 }

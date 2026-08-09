@@ -9,6 +9,7 @@ import {
   getScripts,
   getSnapshot,
   pollJob,
+  revealDirectory,
   saveSnapshot,
   uploadVideo,
 } from '../api.js'
@@ -159,6 +160,16 @@ describe('api client', () => {
         '/api/projects/p1/export',
         expect.objectContaining({ method: 'POST', body: JSON.stringify({ destination: '/tmp/out' }) }),
       )
+    })
+
+    it('revealDirectory POSTs to the reveal route', async () => {
+      global.fetch.mockResolvedValue(jsonResponse({ ok: true }))
+      const data = await revealDirectory('p1')
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/projects/p1/reveal',
+        expect.objectContaining({ method: 'POST', body: JSON.stringify({}) }),
+      )
+      expect(data).toEqual({ ok: true })
     })
 
     it('getMusic GETs the music route', async () => {

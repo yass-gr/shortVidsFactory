@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Preview from '../editor/Preview.jsx'
 import Timeline from '../editor/Timeline.jsx'
 import Inspector from '../editor/Inspector.jsx'
+import ExportBar from '../editor/ExportBar.jsx'
 import { getSnapshot, saveSnapshot } from '../api.js'
 import {
   useTimelineReducer,
@@ -77,6 +78,11 @@ export default function Editor({ projectId }) {
         onSave={handleSave}
         saving={saving}
         saveError={saveError}
+      />
+      <ExportBar
+        projectId={projectId}
+        snapshot={{ cuts, music, font, export_path: exportPath }}
+        enabled={cuts.length >= 1}
       />
       {selected && (
         <p data-testid="editor-selected">

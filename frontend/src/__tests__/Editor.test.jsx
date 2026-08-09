@@ -7,6 +7,9 @@ vi.mock('../api.js', () => ({
   getSnapshot: vi.fn(),
   saveSnapshot: vi.fn(),
   getMusic: vi.fn(),
+  exportProject: vi.fn(),
+  pollJob: vi.fn(),
+  revealDirectory: vi.fn(),
 }))
 
 const SNAPSHOT = {
