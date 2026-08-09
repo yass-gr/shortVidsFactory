@@ -83,6 +83,31 @@ def test_get_scripts_returns_pending_none_when_empty():
     assert r.json() == {"pending": None}
 
 
+def test_get_scripts_returns_pending_none_when_job_errored():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    job = manager.submit(
+        "scripts",
+        lambda args: (_ for _ in ()).throw(RuntimeError("boom")),
+        {"project_id": pid},
+    )
+    api_mod._scripts_jobs[pid] = job.id
+    _wait_job(job.id)
+    assert job.status == JobStatus.error
+    r = client.get(f"/api/projects/{pid}/scripts")
+    assert r.status_code == 200
+    assert r.json() == {"pending": None}
+
+
+def test_get_scripts_returns_pending_none_when_job_unknown():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    api_mod._scripts_jobs[pid] = "unknown-job"
+    r = client.get(f"/api/projects/{pid}/scripts")
+    assert r.status_code == 200
+    assert r.json() == {"pending": None}
+
+
 def test_upload_enqueues_transcribe_and_writes_transcript(monkeypatch):
     client = TestClient(create_app())
     pid = _new_project(client)

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from .config import PROJECT_ROOT, project_dir
 from .editor import EditorSnapshot
 from .export import default_font, export_video
-from .jobs import manager
+from .jobs import JobStatus, manager
 from .media import build_proxy, open_destination, probe
 from .music import CombinedMusicSource, LocalFilesMusicSource, SocialExtractorMusicSource
 from .preview import build_preview
@@ -182,7 +182,15 @@ def api_get_scripts(project_id: str):
     if path.exists():
         data = load_json(path)
         return data if isinstance(data, list) else [data]
-    return {"pending": _scripts_jobs.get(project_id)}
+    pending = _scripts_jobs.get(project_id)
+    if pending:
+        try:
+            job = manager.get(pending)
+        except KeyError:
+            job = None
+        if job is None or job.status == JobStatus.error:
+            pending = None
+    return {"pending": pending}
 
 
 class ApproveBody(BaseModel):
