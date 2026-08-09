@@ -3,13 +3,14 @@ import shutil
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 from .config import PROJECT_ROOT, project_dir
 from .jobs import manager
 from .media import build_proxy, probe
 from .music import CombinedMusicSource, LocalFilesMusicSource, SocialExtractorMusicSource
+from .preview import build_preview
 from .scriptwriter import generate_scripts
 from .scripts import validate_script_candidates
 from .storage import create_project, load_json, save_json
@@ -213,6 +214,21 @@ def api_put_snapshot(project_id: str, snapshot: dict):
     pdir = _require_project(project_id)
     save_json(pdir / "editor.json", snapshot)
     return snapshot
+
+
+@router.get("/projects/{project_id}/preview.mp4")
+def api_preview(project_id: str):
+    pdir = _require_project(project_id)
+    try:
+        snapshot = load_json(pdir / "editor.json")
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="No snapshot yet")
+    track = [{"start": c["source_start"], "end": c["source_end"]} for c in snapshot.get("cuts", [])]
+    source = pdir / "source.mp4"
+    if not source.exists():
+        raise HTTPException(status_code=404, detail="Source video not uploaded")
+    path = build_preview(source, track, pdir / "preview.mp4", width=540)
+    return FileResponse(path, media_type="video/mp4", filename="preview.mp4")
 
 
 class ExportBody(BaseModel):

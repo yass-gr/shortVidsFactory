@@ -252,6 +252,48 @@ def test_snapshot_roundtrip():
     assert r2.json() == snapshot
 
 
+def test_preview_builds_on_demand():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    pdir = _project_dir(pid)
+    shutil.copyfile(CLIP, pdir / "source.mp4")
+    snapshot = {
+        "cuts": [
+            {"source_start": 0.0, "source_end": 1.0,
+             "caption_lines": [{"start": 0.0, "end": 1.0, "text": "one"}]},
+            {"source_start": 1.0, "source_end": 2.0,
+             "caption_lines": [{"start": 1.0, "end": 2.0, "text": "two"}]},
+        ],
+        "music": None,
+        "font": "Arial",
+        "export_path": "",
+    }
+    storage_mod.save_json(pdir / "editor.json", snapshot)
+    r = client.get(f"/api/projects/{pid}/preview.mp4")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "video/mp4"
+    assert (pdir / "preview.mp4").exists()
+
+
+def test_preview_missing_snapshot_404():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    shutil.copyfile(CLIP, _project_dir(pid) / "source.mp4")
+    r = client.get(f"/api/projects/{pid}/preview.mp4")
+    assert r.status_code == 404
+
+
+def test_preview_missing_source_404():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    storage_mod.save_json(_project_dir(pid) / "editor.json", {
+        "cuts": [],
+        "music": None, "font": "Arial", "export_path": "",
+    })
+    r = client.get(f"/api/projects/{pid}/preview.mp4")
+    assert r.status_code == 404
+
+
 def test_export_job_stub():
     client = TestClient(create_app())
     pid = _new_project(client)
