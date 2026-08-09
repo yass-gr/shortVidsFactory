@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 
 class Caption(BaseModel):
@@ -26,16 +26,26 @@ def validate_script_candidates(raw: list[dict], transcript: list[dict], max_dura
     transcript_end = max((t["end"] for t in transcript), default=0.0)
     scripts: list[Script] = []
     for item in raw:
-        st = Script.model_validate(item)
+        try:
+            st = Script.model_validate(item)
+        except ValidationError:
+            continue
         if not (15.0 <= st.duration_s <= max_duration):
-            raise ValueError(f"Script '{st.id}' out of 15s-{max_duration}s")
+            continue
+        valid = True
         for cut in st.cuts:
             if cut.source_end - cut.source_start <= 0.2:
-                raise ValueError(f"Script '{st.id}' has an empty cut")
+                valid = False
+                break
             if cut.source_start < 0 or cut.source_end > transcript_end + 0.5:
-                raise ValueError(f"Script '{st.id}' cut exceeds transcript")
+                valid = False
+                break
             for cap in cut.caption_lines:
                 if cap.start < cut.source_start or cap.end > cut.source_end:
-                    raise ValueError(f"Caption out of cut in '{st.id}'")
-        scripts.append(st)
+                    valid = False
+                    break
+        if valid:
+            scripts.append(st)
+    if not scripts:
+        raise ValueError("No valid scripts in candidates")
     return scripts

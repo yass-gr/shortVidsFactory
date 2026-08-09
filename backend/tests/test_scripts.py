@@ -18,15 +18,44 @@ def test_valid_script_passes_and_bounds_aligned():
     scripts = validate_script_candidates(raw, TRANSCRIPT)
     assert len(scripts) == 1 and scripts[0].id == "a"
 
-def test_script_too_long_rejected():
-    raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 60.0,
-            "words_used": 1,
-            "cuts": [{"source_start": 0.0, "source_end": 60.0, "caption_lines": []}]}]
-    try:
+def test_invalid_script_skipped_while_valid_kept():
+    raw = [
+        {"id": "good", "hook": "h", "summary": "s", "duration_s": 16.0,
+         "words_used": 3,
+         "cuts": [{"source_start": 0.0, "source_end": 1.5,
+                   "caption_lines": [{"start": 0.0, "end": 1.5, "text": "one two three"}]}]},
+        {"id": "bad", "hook": "h", "summary": "s", "duration_s": 60.0,
+         "words_used": 1,
+         "cuts": [{"source_start": 0.0, "source_end": 60.0, "caption_lines": []}]},
+    ]
+    scripts = validate_script_candidates(raw, TRANSCRIPT)
+    assert [s.id for s in scripts] == ["good"]
+
+
+def test_all_invalid_scripts_raise():
+    raw = [
+        {"id": "bad1", "hook": "h", "summary": "s", "duration_s": 60.0,
+         "words_used": 1,
+         "cuts": [{"source_start": 0.0, "source_end": 60.0, "caption_lines": []}]},
+        {"id": "bad2", "hook": "h", "summary": "s", "duration_s": 60.0,
+         "words_used": 1,
+         "cuts": [{"source_start": 0.0, "source_end": 60.0, "caption_lines": []}]},
+    ]
+    with pytest.raises(ValueError):
         validate_script_candidates(raw, TRANSCRIPT)
-        assert False
-    except ValueError:
-        pass
+
+
+def test_structurally_broken_candidate_skipped_while_valid_kept():
+    raw = [
+        {"id": "broken"},
+        {"id": "good", "hook": "h", "summary": "s", "duration_s": 16.0,
+         "words_used": 3,
+         "cuts": [{"source_start": 0.0, "source_end": 1.5,
+                   "caption_lines": [{"start": 0.0, "end": 1.5, "text": "one two three"}]}]},
+    ]
+    scripts = validate_script_candidates(raw, TRANSCRIPT)
+    assert [s.id for s in scripts] == ["good"]
+
 
 def test_cut_exceeding_transcript_rejected():
     raw = [{"id": "a", "hook": "h", "summary": "s", "duration_s": 16.0,
