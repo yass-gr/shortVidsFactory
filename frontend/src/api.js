@@ -27,6 +27,10 @@ export function createProject(name) {
   return apiFetch('/api/projects', { method: 'POST', json: { name } })
 }
 
+export function listProjects() {
+  return apiFetch('/api/projects')
+}
+
 export function uploadVideo(projectId, file) {
   const form = new FormData()
   form.append('file', file)
