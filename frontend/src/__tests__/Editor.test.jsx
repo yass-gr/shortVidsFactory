@@ -47,6 +47,34 @@ describe('Editor', () => {
     expect(screen.getByTestId('font-select').value).toBe('Arial')
   })
 
+  it('keeps the refreshed export path after a successful export when saving', async () => {
+    api.getSnapshot.mockResolvedValue(SNAPSHOT)
+    api.saveSnapshot.mockResolvedValue({})
+    api.exportProject.mockResolvedValue({ job_id: 'j2' })
+    api.pollJob.mockImplementation((jobId, onProgress) => {
+      onProgress({
+        status: 'done',
+        progress: 1,
+        result: { exported: true, path: '/new/path/shortvids_export.mp4' },
+      })
+      return { close: vi.fn() }
+    })
+    render(<Editor projectId="p1" />)
+
+    await waitFor(() => expect(screen.getByTestId('timeline-cut-0')).toBeTruthy())
+    fireEvent.change(screen.getByTestId('export-destination'), { target: { value: '/new/path' } })
+    fireEvent.click(screen.getByTestId('export-button'))
+    await waitFor(() => expect(screen.getByTestId('export-success')).toBeTruthy())
+
+    fireEvent.click(screen.getByTestId('inspector-save'))
+    await waitFor(() =>
+      expect(api.saveSnapshot).toHaveBeenCalledWith(
+        'p1',
+        expect.objectContaining({ export_path: '/new/path/shortvids_export.mp4' }),
+      ),
+    )
+  })
+
   it('saves cuts, font, and music edits back to the snapshot', async () => {
     api.getSnapshot.mockResolvedValue(SNAPSHOT)
     api.getMusic.mockResolvedValue({

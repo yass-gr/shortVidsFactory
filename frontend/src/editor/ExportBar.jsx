@@ -9,7 +9,7 @@ function defaultDestination(exportPath) {
   return '/tmp'
 }
 
-export default function ExportBar({ projectId, snapshot, enabled }) {
+export default function ExportBar({ projectId, snapshot, enabled, onExported }) {
   const [destination, setDestination] = useState(defaultDestination(snapshot.export_path))
   const [progress, setProgress] = useState(0)
   const [exporting, setExporting] = useState(false)
@@ -32,6 +32,7 @@ export default function ExportBar({ projectId, snapshot, enabled }) {
           if (data.status === 'done') {
             setExporting(false)
             setDone(true)
+            onExported?.(data?.result?.path)
           } else if (data.status === 'error') {
             setExporting(false)
             setError(data.error || 'Export failed')

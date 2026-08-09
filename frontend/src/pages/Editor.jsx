@@ -83,6 +83,7 @@ export default function Editor({ projectId }) {
         projectId={projectId}
         snapshot={{ cuts, music, font, export_path: exportPath }}
         enabled={cuts.length >= 1}
+        onExported={(path) => path && setExportPath(path)}
       />
       {selected && (
         <p data-testid="editor-selected">

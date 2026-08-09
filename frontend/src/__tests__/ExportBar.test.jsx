@@ -52,6 +52,18 @@ describe('ExportBar', () => {
     expect(api.revealDirectory).toHaveBeenCalledWith('p1')
   })
 
+  it('reports the exported path up to onExported', async () => {
+    const onExported = vi.fn()
+    api.pollJob.mockImplementation((jobId, onProgress) => {
+      onProgress({ status: 'done', progress: 1, result: { exported: true, path: '/x/y/shortvids_export.mp4' } })
+      return { close: vi.fn() }
+    })
+    render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled onExported={onExported} />)
+    fireEvent.click(screen.getByTestId('export-button'))
+
+    await waitFor(() => expect(onExported).toHaveBeenCalledWith('/x/y/shortvids_export.mp4'))
+  })
+
   it('shows the error and allows retry', async () => {
     api.pollJob.mockImplementation((jobId, onProgress) => {
       onProgress({ status: 'error', progress: 1, error: 'kaboom' })
