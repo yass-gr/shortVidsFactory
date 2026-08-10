@@ -1,0 +1,6 @@
+{
+  "name": "ShortVidsFactory",
+  "description": "AI-powered short video generator turning spoken-word videos into 9:16 short clips with captions, music, and trimming.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

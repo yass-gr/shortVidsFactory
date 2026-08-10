@@ -39,4 +39,14 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('timeline-cut-1'))
     expect(screen.getByTestId('editor-selected').textContent).toContain('Selected cut 2')
   })
+
+  it('navigates to the upload page when the new project link is clicked', async () => {
+    window.history.pushState({}, '', '#/')
+    render(<App />)
+    fireEvent.click(screen.getByText('New project'))
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'New project' })).toBeTruthy(),
+    )
+    expect(window.location.hash).toBe('#/new')
+  })
 })

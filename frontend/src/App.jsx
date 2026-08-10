@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Projects from './pages/Projects.jsx'
 import Scripts from './pages/Scripts.jsx'
 import Upload from './pages/Upload.jsx'
@@ -9,10 +9,25 @@ const findProjectRoute = (route) => {
   return m ? { projectId: m[1], page: m[2] } : null
 }
 
+const routeFromHash = () => {
+  const hash = window.location.hash
+  return hash && hash.length > 1 ? hash.slice(1) : '/'
+}
+
 export default function App({ initialRoute = '/' }) {
-  const [route, setRoute] = useState(initialRoute)
+  const [route, setRoute] = useState(() => {
+    const fromHash = routeFromHash()
+    return window.location.hash && window.location.hash.length > 1 ? fromHash : initialRoute
+  })
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(routeFromHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
 
   function navigate(next) {
+    window.location.hash = next
     setRoute(next)
   }
 
