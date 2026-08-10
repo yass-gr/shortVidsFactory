@@ -10,7 +10,7 @@ from .config import PROJECT_ROOT, project_dir
 from .editor import EditorSnapshot
 from .export import default_font, export_video
 from .jobs import JobStatus, manager
-from .media import build_proxy, open_destination, probe
+from .media import build_proxy, extract_frame, open_destination, probe
 from .music import CombinedMusicSource, LocalFilesMusicSource, SocialExtractorMusicSource
 from .preview import build_preview
 from .scriptwriter import generate_scripts
@@ -288,6 +288,20 @@ def api_preview(project_id: str):
         raise HTTPException(status_code=404, detail="Source video not uploaded")
     path = build_preview(source, track, pdir / "preview.mp4", width=540)
     return FileResponse(path, media_type="video/mp4", filename="preview.mp4")
+
+
+@router.get("/projects/{project_id}/frame")
+def api_frame(project_id: str, t: float = 0.0):
+    pdir = _require_project(project_id)
+    source = pdir / "source.mp4"
+    if not source.exists():
+        raise HTTPException(status_code=404, detail="Source video not uploaded")
+    out = pdir / f"frame_{round(max(t, 0.0), 1)}.jpg"
+    try:
+        extract_frame(source, out, max(t, 0.0))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Could not extract frame")
+    return FileResponse(out, media_type="image/jpeg", filename=out.name)
 
 
 class ExportBody(BaseModel):

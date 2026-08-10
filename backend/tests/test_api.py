@@ -550,3 +550,23 @@ def test_list_projects_handles_missing_source(monkeypatch):
     body = client.get("/api/projects").json()
     by_id = {p["id"]: p for p in body["projects"]}
     assert by_id[pid]["duration_s"] is None
+
+
+def test_frame_endpoint_returns_cached_jpeg():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    pdir = config_mod.PROJECT_ROOT / pid
+    shutil.copyfile(CLIP, pdir / "source.mp4")
+    r = client.get(f"/api/projects/{pid}/frame?t=0.5")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "image/jpeg"
+    assert (pdir / "frame_0.5.jpg").exists()
+    r2 = client.get(f"/api/projects/{pid}/frame?t=0.5")
+    assert r2.status_code == 200
+
+
+def test_frame_endpoint_missing_source_404():
+    client = TestClient(create_app())
+    pid = _new_project(client)
+    r = client.get(f"/api/projects/{pid}/frame")
+    assert r.status_code == 404

@@ -34,3 +34,14 @@ def open_destination(path: Path) -> None:
 def path_escaped(path: Path) -> str:
     escaped = path.as_posix().replace("'", "'\\''")
     return f"'{escaped}'"
+
+
+def extract_frame(source: Path, out_path: Path, t: float = 0.0) -> Path:
+    if out_path.exists():
+        return out_path
+    subprocess.run(
+        ["ffmpeg", "-y", "-ss", f"{t:.1f}", "-i", str(source),
+         "-frames:v", "1", "-q:v", "2", str(out_path)],
+        check=True, capture_output=True,
+    )
+    return out_path

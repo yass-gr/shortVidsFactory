@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from app.media import build_proxy, path_escaped, probe
@@ -22,3 +23,11 @@ def test_build_proxy_downscales(tmp_path):
 
 def test_path_escaped_quotes_single_quote():
     assert path_escaped(Path("a'b.mp4")) == "'a'\\''b.mp4'"
+
+
+def test_extract_frame_writes_jpeg(tmp_path):
+    from app.media import extract_frame
+    source = tmp_path / "src.mp4"
+    shutil.copyfile(CLIP, source)
+    out = extract_frame(source, tmp_path / "frame.jpg", 1.5)
+    assert out.exists()
