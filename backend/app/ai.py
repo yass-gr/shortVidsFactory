@@ -86,6 +86,12 @@ class GeminiClient:
             except (ValueError, KeyError, TypeError):
                 message = resp.text[:200] or f"HTTP {resp.status_code}"
             raise InvalidAIOutput(f"Gemini API error {resp.status_code}: {message}")
-        data = resp.json()
-        parts = data["candidates"][0]["content"]["parts"]
-        return "".join(p.get("text", "") for p in parts)
+        try:
+            data = resp.json()
+            parts = data["candidates"][0]["content"]["parts"]
+            return "".join(p.get("text", "") for p in parts)
+        except (ValueError, KeyError, IndexError, TypeError):
+            snippet = resp.text[:200] or "<empty>"
+            raise InvalidAIOutput(
+                f"Gemini returned no usable candidates. Response snippet: {snippet}"
+            )

@@ -2,7 +2,11 @@ import json
 
 import pytest
 
-from app.scriptwriter import SCRIPT_PROMPT_TEMPLATE, generate_scripts
+from app.scriptwriter import (
+    InvalidAIOutput,
+    SCRIPT_PROMPT_TEMPLATE,
+    generate_scripts,
+)
 
 
 TRANSCRIPT = [
@@ -61,6 +65,6 @@ def test_generate_scripts_retries_once_after_timeout():
 
 def test_generate_scripts_gives_up_with_clear_error_after_repeated_timeouts():
     client = FakeClient(attempts_before_success=99)
-    with pytest.raises(Exception) as exc:
+    with pytest.raises(InvalidAIOutput) as exc:
         generate_scripts(client, TRANSCRIPT, duration_s=30.0)
     assert "timed out" in str(exc.value)
