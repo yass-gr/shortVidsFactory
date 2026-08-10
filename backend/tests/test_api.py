@@ -207,9 +207,10 @@ def test_generate_scripts_job_writes_scripts(monkeypatch):
         cuts=[Cut(source_start=0.0, source_end=0.8,
                   caption_lines=[Caption(start=0.0, end=0.8, text="hello world")])],
     )
+    monkeypatch.setattr(api_mod, "_get_client", lambda: object())
     monkeypatch.setattr(
         api_mod, "generate_scripts",
-        lambda client, project_id, transcript, duration_s: [script],
+        lambda client, transcript, duration_s, retries=2: [script],
     )
 
     r = client.post(f"/api/projects/{pid}/scripts", json={})

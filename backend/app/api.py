@@ -24,9 +24,9 @@ _scripts_jobs: dict[str, str] = {}
 
 
 def _get_client():
-    from .ai import OpenCodeClient
+    from .ai import GeminiClient
 
-    return OpenCodeClient()
+    return GeminiClient()
 
 
 # --- job workers -------------------------------------------------------------
@@ -48,7 +48,7 @@ def _scripts_job(args: dict):
     pdir = project_dir(project_id)
     transcript = load_json(pdir / "transcript.json")
     duration_s = probe(pdir / "source.mp4")["duration_s"]
-    scripts = generate_scripts(_get_client(), project_id, transcript, duration_s)
+    scripts = generate_scripts(_get_client(), transcript, duration_s)
     data = [s.model_dump() for s in scripts]
     save_json(pdir / "scripts.json", data)
     return data
