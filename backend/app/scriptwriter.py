@@ -1,6 +1,4 @@
-from pathlib import Path
-from .ai import OpenCodeClient, extract_json_blocks
-from .config import project_dir
+from .ai import InvalidAIOutput, extract_json_blocks
 from .scripts import Script, validate_script_candidates
 
 
@@ -25,14 +23,22 @@ def transcript_to_prompt(transcript: list[dict]) -> str:
     return " | ".join(f"{t['start']:.2f}-{t['end']:.2f} {t['text']}" for t in transcript)
 
 
-def generate_scripts(client: OpenCodeClient, project_id: str,
-                     transcript: list[dict], duration_s: float) -> list[Script]:
-    project_path = project_dir(project_id)
+def generate_scripts(client, transcript: list[dict], duration_s: float,
+                     retries: int = 2) -> list[Script]:
     prompt = SCRIPT_PROMPT_TEMPLATE.format(
         transcript=transcript_to_prompt(transcript),
         duration=duration_s,
     )
-    stdout = client.run(prompt, cwd=project_path, agent="shortvids-scriptwriter")
-    raw = extract_json_blocks(stdout)[-1]
-    candidates = raw["scripts"] if isinstance(raw, dict) else raw
-    return validate_script_candidates(candidates, transcript)
+    last_error: Exception | None = None
+    for _ in range(retries + 1):
+        try:
+            stdout = client.run(prompt)
+            raw = extract_json_blocks(stdout)[-1]
+            candidates = raw["scripts"] if isinstance(raw, dict) else raw
+            return validate_script_candidates(candidates, transcript)
+        except TimeoutError as e:
+            last_error = e
+    raise InvalidAIOutput(
+        f"Script generation timed out after {retries + 1} attempts (model provider "
+        f"did not respond within {getattr(client, 'timeout', '<unset>')}s). Please retry."
+    ) from last_error
