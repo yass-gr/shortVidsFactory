@@ -130,7 +130,38 @@ def api_list_projects():
             meta = load_json(d / "project.json")
         except FileNotFoundError:
             pass
-        projects.append({"id": meta.get("id", d.name), "name": meta.get("name", d.name)})
+
+        duration_s = None
+        source = d / "source.mp4"
+        if source.exists():
+            try:
+                duration_s = probe(source)["duration_s"]
+            except Exception:  # uninspectable media / missing ffmpeg
+                duration_s = None
+
+        if (d / "editor.json").exists():
+            status = "ready"
+        elif (d / "scripts.json").exists():
+            status = "processing"
+        else:
+            status = "draft"
+
+        edited_at = None
+        candidates = [d] + [d / n for n in
+                            ("project.json", "source.mp4", "transcript.json",
+                             "scripts.json", "editor.json")]
+        mtimes = [p.stat().st_mtime for p in candidates if p.exists()]
+        if mtimes:
+            edited_at = __import__("datetime").datetime.fromtimestamp(
+                max(mtimes)).isoformat()
+
+        projects.append({
+            "id": meta.get("id", d.name),
+            "name": meta.get("name", d.name),
+            "duration_s": duration_s,
+            "status": status,
+            "edited_at": edited_at,
+        })
     return {"projects": projects}
 
 

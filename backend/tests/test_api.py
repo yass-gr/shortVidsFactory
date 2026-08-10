@@ -500,3 +500,53 @@ def test_music_list(tmp_path, monkeypatch):
     assert len(body["tracks"]) == 1
     assert body["tracks"][0]["title"] == "a.mp3"
     assert body["social"] is False
+
+
+def _touch(pdir, name, ts):
+    p = pdir / name
+    p.touch()
+    import os
+    os.utime(p, (ts, ts))
+
+
+def test_list_projects_enriched_draft():
+    client = TestClient(create_app())
+    pid = _new_project(client, "demo")
+    body = client.get("/api/projects").json()
+    by_id = {p["id"]: p for p in body["projects"]}
+    assert by_id[pid]["status"] == "draft"
+    assert by_id[pid]["duration_s"] is None
+    assert isinstance(by_id[pid]["edited_at"], str)
+
+
+def test_list_projects_processing_and_ready():
+    client = TestClient(create_app())
+    p1 = _new_project(client, "p1")
+    p2 = _new_project(client, "p2")
+    (config_mod.PROJECT_ROOT / p1 / "scripts.json").write_text("[]")
+    (config_mod.PROJECT_ROOT / p2 / "editor.json").write_text('{"cuts": []}')
+    body = client.get("/api/projects").json()
+    by_id = {p["id"]: p for p in body["projects"]}
+    assert by_id[p1]["status"] == "processing"
+    assert by_id[p2]["status"] == "ready"
+
+
+def test_list_projects_duration_and_edited_at(monkeypatch):
+    client = TestClient(create_app())
+    pid = _new_project(client, "demo")
+    pdir = config_mod.PROJECT_ROOT / pid
+    shutil.copyfile(CLIP, pdir / "source.mp4")
+    monkeypatch.setattr(api_mod, "probe", lambda path: {"width": 320, "height": 240, "duration_s": 5.0})
+    body = client.get("/api/projects").json()
+    by_id = {p["id"]: p for p in body["projects"]}
+    assert by_id[pid]["duration_s"] == 5.0
+    assert isinstance(by_id[pid]["edited_at"], str)
+
+
+def test_list_projects_handles_missing_source(monkeypatch):
+    client = TestClient(create_app())
+    pid = _new_project(client, "demo")
+    monkeypatch.setattr(api_mod, "probe", lambda path: (_ for _ in ()).throw(OSError("nope")))
+    body = client.get("/api/projects").json()
+    by_id = {p["id"]: p for p in body["projects"]}
+    assert by_id[pid]["duration_s"] is None
