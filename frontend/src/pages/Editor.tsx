@@ -24,10 +24,11 @@ const DEFAULT_FONT = 'Arial'
 interface EditorProps {
   projectId: string
   onRegisterSave?: (fn: () => void) => void
+  onNavigateExport?: (projectId: string, jobId: string, destination: string) => void
   onBack?: () => void
 }
 
-export default function Editor({ projectId, onRegisterSave, onBack }: EditorProps) {
+export default function Editor({ projectId, onRegisterSave, onNavigateExport, onBack }: EditorProps) {
   const [state, dispatch] = useTimelineReducer([])
   const [font, setFont] = useState(DEFAULT_FONT)
   const [music, setMusic] = useState<SnapshotMusic | null>(null)
@@ -114,11 +115,6 @@ export default function Editor({ projectId, onRegisterSave, onBack }: EditorProp
   const captions = markDirty((i: number | null, lines: CaptionLine[]) => {
     if (i !== null) dispatch(updateCutCaptions(i, lines))
   })
-
-  function handleExported(path?: string) {
-    if (path) setExportPath(path)
-    setHasUnsavedChanges(false)
-  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-60px)] bg-[#0D0F11] text-[#F5F5F2] overflow-hidden select-none">
@@ -296,7 +292,7 @@ export default function Editor({ projectId, onRegisterSave, onBack }: EditorProp
         projectId={projectId}
         snapshot={{ cuts, music, font, export_path: exportPath }}
         enabled={cuts.length > 0}
-        onExported={handleExported}
+        onNavigateExport={(jobId, dest) => onNavigateExport?.(projectId, jobId, dest)}
       />
     </div>
   )

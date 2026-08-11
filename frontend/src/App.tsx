@@ -6,9 +6,11 @@ import Projects from './pages/Projects'
 import Upload from './pages/Upload'
 import Scripts from './pages/Scripts'
 import Editor from './pages/Editor'
+import Exporting from './pages/Exporting'
 
 const SCREEN_BY_PATH: Array<[RegExp, AppScreen]> = [
   [/^\/new$/, 'upload'],
+  [/^\/project\/[^/]+\/export/, 'exporting'],
   [/^\/project\/[^/]+\/scripts$/, 'scripts'],
   [/^\/project\/[^/]+\/editor$/, 'editor'],
   [/^[^/]*$|^\//, 'projects'],
@@ -41,7 +43,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   }, [])
 
   useEffect(() => {
-    const m = route.match(/^\/project\/[^/]+\/(scripts|editor)$/)
+    const m = route.match(/^\/project\/[^/]+\/(scripts|editor|export)/)
     setActiveProjectTitle(m ? `Project ${m[1]}` : null)
   }, [route])
 
@@ -68,6 +70,14 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
     setActiveProjectTitle(projectId ? `Project ${projectId}` : null)
   }
 
+  function navigateExport(projectId: string, jobId: string, destination: string) {
+    const params = new URLSearchParams({ job: jobId, dest: destination })
+    const next = `/project/${projectId}/export?${params.toString()}`
+    window.location.hash = `#${next}`
+    setRoute(next)
+    setActiveProjectTitle(`Project ${projectId}`)
+  }
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -81,7 +91,19 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   const currentScreen = screenForRoute(route)
 
   let pageBody: React.ReactNode
-  if (route === '/new') {
+  const exportMatch = route.match(/^\/project\/([^/]+)\/export/)
+  if (exportMatch) {
+    const pid = exportMatch[1]
+    const params = new URLSearchParams(route.includes('?') ? route.split('?')[1] : '')
+    pageBody = (
+      <Exporting
+        projectId={pid}
+        jobId={params.get('job') ?? ''}
+        destination={params.get('dest') ?? ''}
+        onBack={() => navigate('editor', pid)}
+      />
+    )
+  } else if (route === '/new') {
     pageBody = <Upload onUploaded={(pid) => navigate('scripts', pid)} />
   } else {
     const m = route.match(/^\/project\/([^/]+)\/(scripts|editor)$/)
@@ -94,6 +116,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
           onRegisterSave={(fn) => {
             saveEditorRef.current = fn
           }}
+          onNavigateExport={navigateExport}
         />
       )
     } else {

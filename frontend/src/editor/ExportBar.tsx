@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Folder, Send } from 'lucide-react'
 import type { EditorSnapshot } from '../types'
-import { exportProject, pollJob, revealDirectory, saveSnapshot } from '../api'
+import { exportProject, saveSnapshot } from '../api'
 
 function defaultDestination(exportPath: string) {
   if (exportPath) {
@@ -15,14 +15,12 @@ interface ExportBarProps {
   projectId: string
   snapshot: EditorSnapshot
   enabled: boolean
-  onExported?: (path: string | undefined) => void
+  onNavigateExport?: (jobId: string, destination: string) => void
 }
 
-export default function ExportBar({ projectId, snapshot, enabled, onExported }: ExportBarProps) {
+export default function ExportBar({ projectId, snapshot, enabled, onNavigateExport }: ExportBarProps) {
   const [destination, setDestination] = useState(defaultDestination(snapshot.export_path))
-  const [progress, setProgress] = useState(0)
   const [exporting, setExporting] = useState(false)
-  const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const canExport = enabled && !exporting && destination.trim() !== ''
@@ -30,25 +28,12 @@ export default function ExportBar({ projectId, snapshot, enabled, onExported }: 
   function handleExport() {
     if (!canExport) return
     setExporting(true)
-    setDone(false)
     setError(null)
-    setProgress(0)
     saveSnapshot(projectId, snapshot)
       .then(() => exportProject(projectId, destination.trim()))
       .then((result) => {
         const { job_id } = result as { job_id: string }
-        pollJob(job_id, (data) => {
-          setProgress(data.progress || 0)
-          if (data.status === 'done') {
-            setExporting(false)
-            setDone(true)
-            const exportedPath = (data?.result as { path?: string } | undefined)?.path
-            onExported?.(exportedPath)
-          } else if (data.status === 'error') {
-            setExporting(false)
-            setError(data.error || 'Export failed')
-          }
-        })
+        onNavigateExport?.(job_id, destination.trim())
       })
       .catch((err) => {
         setExporting(false)
@@ -80,46 +65,10 @@ export default function ExportBar({ projectId, snapshot, enabled, onExported }: 
 
       <div className="flex items-center gap-4">
         <div className="flex flex-col items-end gap-1">
-          {exporting && (
-            <div className="flex items-center gap-2 text-xs text-[#A7A9A8]">
-              <progress
-                data-testid="export-progress"
-                max={1}
-                value={progress}
-                className="w-24 h-1.5 rounded-full overflow-hidden [&::-webkit-progress-bar]:bg-[#24282D] [&::-webkit-progress-value]:bg-[#D5FF3F]"
-              />
-              <span className="font-mono">{Math.round(progress * 100)}%</span>
-            </div>
-          )}
-          {done && (
-            <p data-testid="export-success" className="text-[11px] text-[#D5FF3F] font-semibold">
-              Export complete
-            </p>
-          )}
-          {done && (
-            <button
-              type="button"
-              data-testid="open-folder"
-              onClick={() => revealDirectory(projectId)}
-              className="text-[11px] text-[#A7A9A8] underline underline-offset-2 hover:text-white transition-colors cursor-pointer"
-            >
-              Open folder
-            </button>
-          )}
           {error && (
-            <p data-testid="export-error" className="text-[11px] text-[#FF5B63]">
+            <p data-testid="export-notice" className="text-[11px] text-[#FF5B63]">
               {error}
             </p>
-          )}
-          {error && (
-            <button
-              type="button"
-              data-testid="export-retry"
-              onClick={handleExport}
-              className="text-[11px] text-[#A7A9A8] underline underline-offset-2 hover:text-white transition-colors cursor-pointer"
-            >
-              Retry
-            </button>
           )}
         </div>
 
@@ -131,7 +80,7 @@ export default function ExportBar({ projectId, snapshot, enabled, onExported }: 
           className="flex items-center gap-2 bg-[#D5FF3F] hover:bg-[#E2FF70] text-black text-xs font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-[#D5FF3F]/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Send className="w-3.5 h-3.5" />
-          <span>Export</span>
+          <span>{exporting ? 'Exporting…' : 'Export'}</span>
         </button>
       </div>
     </footer>

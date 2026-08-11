@@ -38,45 +38,33 @@ describe('ExportBar', () => {
     expect((screen.getByTestId('export-button') as HTMLButtonElement).disabled).toBe(false)
   })
 
-  it('saves, exports, polls, and reveals the folder on success', async () => {
-    apiMock.pollJob.mockImplementation((jobId, onProgress) => {
-      onProgress?.({ id: jobId, status: 'done', progress: 1 })
-      return { close: vi.fn() } as unknown as EventSource
-    })
-    render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled />)
+  it('saves, exports, then navigates to the export screen without revealing the folder inline', async () => {
+    const onNavigateExport = vi.fn()
+    render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled onNavigateExport={onNavigateExport} />)
     fireEvent.change(screen.getByTestId('export-destination'), { target: { value: '/tmp/vids' } })
     fireEvent.click(screen.getByTestId('export-button'))
 
     await waitFor(() => expect(apiMock.saveSnapshot).toHaveBeenCalledWith('p1', SNAPSHOT))
     await waitFor(() => expect(apiMock.exportProject).toHaveBeenCalledWith('p1', '/tmp/vids'))
-    await waitFor(() => expect(screen.getByTestId('open-folder')).toBeTruthy())
-
-    fireEvent.click(screen.getByTestId('open-folder'))
-    expect(apiMock.revealDirectory).toHaveBeenCalledWith('p1')
+    await waitFor(() => expect(onNavigateExport).toHaveBeenCalledWith('j1', '/tmp/vids'))
+    expect(apiMock.revealDirectory).not.toHaveBeenCalled()
   })
 
-  it('reports the exported path up to onExported', async () => {
-    const onExported = vi.fn()
-    apiMock.pollJob.mockImplementation((jobId, onProgress) => {
-      onProgress?.({ id: jobId, status: 'done', progress: 1, result: { exported: true, path: '/x/y/shortvids_export.mp4' } })
-      return { close: vi.fn() } as unknown as EventSource
-    })
-    render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled onExported={onExported} />)
-    fireEvent.click(screen.getByTestId('export-button'))
-
-    await waitFor(() => expect(onExported).toHaveBeenCalledWith('/x/y/shortvids_export.mp4'))
-  })
-
-  it('shows the error and allows retry', async () => {
-    apiMock.pollJob.mockImplementation((jobId, onProgress) => {
-      onProgress?.({ id: jobId, status: 'error', progress: 1, error: 'kaboom' })
-      return { close: vi.fn() } as unknown as EventSource
-    })
+  it('keeps the destination input editable', () => {
     render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled />)
+    const input = screen.getByTestId('export-destination') as HTMLInputElement
+    fireEvent.change(input, { target: { value: '/tmp/newdir' } })
+    expect(input.value).toBe('/tmp/newdir')
+  })
+
+  it('does not navigate when the export job fails to start', async () => {
+    apiMock.exportProject.mockRejectedValue(new Error('kaboom'))
+    const onNavigateExport = vi.fn()
+    render(<ExportBar projectId="p1" snapshot={SNAPSHOT} enabled onNavigateExport={onNavigateExport} />)
     fireEvent.change(screen.getByTestId('export-destination'), { target: { value: '/tmp/vids' } })
     fireEvent.click(screen.getByTestId('export-button'))
 
-    await waitFor(() => expect(screen.getByTestId('export-error').textContent).toContain('kaboom'))
-    expect(screen.getByTestId('export-retry')).toBeTruthy()
+    await waitFor(() => expect(onNavigateExport).not.toHaveBeenCalled())
+    expect(screen.getByText(/kaboom/)).toBeTruthy()
   })
 })
