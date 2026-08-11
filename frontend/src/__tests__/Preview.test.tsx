@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import Preview from '../editor/Preview.jsx'
+import Preview from '../editor/Preview.tsx'
 
 const CUTS = [
   {
@@ -26,8 +26,8 @@ const TRIMMED_CUTS = [
   { source_start: 10, source_end: 11, caption_lines: [{ start: 10, end: 11, text: 'Cut short' }] },
 ]
 
-let playMock
-let pauseMock
+let playMock: ReturnType<typeof vi.fn>
+let pauseMock: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   playMock = vi.fn().mockResolvedValue(undefined)
@@ -42,9 +42,9 @@ beforeEach(() => {
   })
 })
 
-const getVideo = () => document.querySelector('video')
+const getVideo = (): HTMLVideoElement => document.querySelector('video') as HTMLVideoElement
 
-function seekTo(video, time) {
+function seekTo(video: HTMLVideoElement, time: number) {
   video.currentTime = time
   fireEvent(video, new Event('timeupdate'))
 }

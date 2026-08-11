@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import Preview from '../editor/Preview.jsx'
-import Timeline from '../editor/Timeline.jsx'
+import Preview from '../editor/Preview'
+import Timeline from '../editor/Timeline'
 import Inspector from '../editor/Inspector.jsx'
 import ExportBar from '../editor/ExportBar.jsx'
 import { getSnapshot, saveSnapshot } from '../api.js'

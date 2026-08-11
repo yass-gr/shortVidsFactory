@@ -1,36 +1,29 @@
 import { useReducer } from 'react'
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+export interface CaptionLine { start: number; end: number; text: string }
+export interface Cut { source_start: number; source_end: number; caption_lines: CaptionLine[] }
+export interface TimelineState { cuts: Cut[]; selectedId: number | null }
 
-export function selectCut(index) {
-  return { type: 'select', index }
-}
+type Action =
+  | { type: 'select'; index: number | null }
+  | { type: 'trim'; index: number; which: 'left' | 'right'; boundary: number }
+  | { type: 'reorder'; from: number; to: number }
+  | { type: 'duplicate'; index: number }
+  | { type: 'delete'; index: number | null }
+  | { type: 'replace'; cuts: Cut[] }
+  | { type: 'captions'; index: number; captionLines: CaptionLine[] }
 
-export function trimCut(index, which, boundary) {
-  return { type: 'trim', index, which, boundary }
-}
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
-export function reorderCut(from, to) {
-  return { type: 'reorder', from, to }
-}
+export function selectCut(index: number | null) { return { type: 'select', index } as Action }
+export function trimCut(index: number, which: 'left' | 'right', boundary: number) { return { type: 'trim', index, which, boundary } as Action }
+export function reorderCut(from: number, to: number) { return { type: 'reorder', from, to } as Action }
+export function duplicateCut(index: number) { return { type: 'duplicate', index } as Action }
+export function deleteCut(index: number | null) { return { type: 'delete', index } as Action }
+export function replaceCuts(cuts: Cut[]) { return { type: 'replace', cuts } as Action }
+export function updateCutCaptions(index: number, captionLines: CaptionLine[]) { return { type: 'captions', index, captionLines } as Action }
 
-export function duplicateCut(index) {
-  return { type: 'duplicate', index }
-}
-
-export function deleteCut(index) {
-  return { type: 'delete', index }
-}
-
-export function replaceCuts(cuts) {
-  return { type: 'replace', cuts }
-}
-
-export function updateCutCaptions(index, captionLines) {
-  return { type: 'captions', index, captionLines }
-}
-
-export function timelineReducer(state, action) {
+export function timelineReducer(state: TimelineState, action: Action): TimelineState {
   const { cuts, selectedId } = state
   switch (action.type) {
     case 'select': {
@@ -69,9 +62,9 @@ export function timelineReducer(state, action) {
       let nextSelectedId = selectedId
       if (selectedId === from) {
         nextSelectedId = to
-      } else if (from < to && selectedId > from && selectedId <= to) {
+      } else if (selectedId !== null && from < to && selectedId > from && selectedId <= to) {
         nextSelectedId = selectedId - 1
-      } else if (from > to && selectedId >= to && selectedId < from) {
+      } else if (selectedId !== null && from > to && selectedId >= to && selectedId < from) {
         nextSelectedId = selectedId + 1
       }
       return { cuts: nextCuts, selectedId: nextSelectedId }
@@ -117,6 +110,6 @@ export function timelineReducer(state, action) {
   }
 }
 
-export function useTimelineReducer(initialCuts = []) {
+export function useTimelineReducer(initialCuts: Cut[] = []) {
   return useReducer(timelineReducer, initialCuts, (cuts) => ({ cuts, selectedId: null }))
 }

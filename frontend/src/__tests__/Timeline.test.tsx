@@ -9,8 +9,8 @@ import {
   deleteCut,
   replaceCuts,
   updateCutCaptions,
-} from '../editor/useTimelineReducer.js'
-import Timeline from '../editor/Timeline.jsx'
+} from '../editor/useTimelineReducer.ts'
+import Timeline from '../editor/Timeline.tsx'
 
 const CUTS = [
   { source_start: 0, source_end: 4, caption_lines: [{ start: 0, end: 2, text: 'One' }] },
@@ -18,7 +18,7 @@ const CUTS = [
   { source_start: 20, source_end: 25, caption_lines: [] },
 ]
 
-const state = (selectedId = null) => ({ cuts: CUTS, selectedId })
+const state = (selectedId: number | null = null) => ({ cuts: CUTS, selectedId })
 
 describe('useTimelineReducer', () => {
   describe('select', () => {
@@ -253,7 +253,7 @@ describe('Timeline', () => {
 
   it('disables the Duplicate button when nothing is selected', () => {
     render(<Timeline cuts={CUTS} selectedId={null} {...handlers()} />)
-    expect(screen.getByRole('button', { name: /duplicate/i }).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /duplicate/i }) as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('deletes the selected cut when the Delete key is pressed', () => {
@@ -280,7 +280,7 @@ describe('Timeline', () => {
   it('cannot delete the last remaining cut', () => {
     const h = handlers()
     render(<Timeline cuts={[CUTS[0]]} selectedId={0} {...h} />)
-    expect(screen.getByRole('button', { name: /delete/i }).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /delete/i }) as HTMLButtonElement).disabled).toBe(true)
     fireEvent.keyDown(screen.getByTestId('timeline'), { key: 'Delete' })
     expect(h.onDelete).not.toHaveBeenCalled()
   })
