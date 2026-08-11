@@ -85,7 +85,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   } else {
     const m = route.match(/^\/project\/([^/]+)\/(scripts|editor)$/)
     if (m && m[2] === 'scripts') {
-      pageBody = <Scripts projectId={m[1]} navigate={(r: string) => navigate('editor', m[1])} />
+      pageBody = <Scripts projectId={m[1]} onPick={() => navigate('editor', m[1])} />
     } else if (m && m[2] === 'editor') {
       pageBody = <Editor projectId={m[1]} />
     } else {
