@@ -11,3 +11,5 @@ dist/
 .env
 backend/.env
 *.egg-info
+# venv symlink (points outside worktree)
+backend/.venv
