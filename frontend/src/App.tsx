@@ -81,7 +81,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
 
   let pageBody: React.ReactNode
   if (route === '/new') {
-    pageBody = <Upload onNavigate={(r: string) => navigate('projects')} />
+    pageBody = <Upload onUploaded={(pid) => navigate('scripts', pid)} />
   } else {
     const m = route.match(/^\/project\/([^/]+)\/(scripts|editor)$/)
     if (m && m[2] === 'scripts') {
