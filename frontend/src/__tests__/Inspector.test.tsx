@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import Inspector from '../editor/Inspector.jsx'
+import Inspector from '../editor/Inspector.tsx'
 import * as api from '../api.js'
 
 vi.mock('../api.js', () => ({
   getMusic: vi.fn(),
 }))
+
+const apiMock = vi.mocked(api)
 
 const TRACKS = [
   { id: 'm1', title: 'Upbeat', source: 'local', path: '/music/upbeat.mp3' },
@@ -57,13 +59,13 @@ const musicLoaded = () => screen.findByText('Upbeat')
 describe('Inspector', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    api.getMusic.mockResolvedValue({ tracks: TRACKS, social: false, uses_local: true })
+    apiMock.getMusic.mockResolvedValue({ tracks: TRACKS, social: false, uses_local: true })
   })
 
   it('renders the caption text of the selected cut', async () => {
     renderInspector()
-    expect(screen.getByTestId('caption-text-0').value).toBe('Hello')
-    expect(screen.getByTestId('caption-text-1').value).toBe('World')
+    expect((screen.getByTestId('caption-text-0') as HTMLInputElement).value).toBe('Hello')
+    expect((screen.getByTestId('caption-text-1') as HTMLInputElement).value).toBe('World')
     await musicLoaded()
   })
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import Preview from '../editor/Preview'
 import Timeline from '../editor/Timeline'
-import Inspector from '../editor/Inspector.jsx'
-import ExportBar from '../editor/ExportBar.jsx'
+import Inspector from '../editor/Inspector'
+import ExportBar from '../editor/ExportBar'
 import { getSnapshot, saveSnapshot } from '../api.js'
 import {
   useTimelineReducer,
