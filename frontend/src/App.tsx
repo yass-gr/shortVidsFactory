@@ -89,7 +89,13 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
     } else if (m && m[2] === 'editor') {
       pageBody = <Editor projectId={m[1]} />
     } else {
-      pageBody = <Projects onNavigate={(r: string) => navigate('projects')} />
+      pageBody = (
+        <Projects
+          onSelectProject={(p) => navigate(p.status === 'processing' ? 'scripts' : 'editor', p.id)}
+          onNewProjectClick={() => navigate('upload')}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
+      )
     }
   }
 

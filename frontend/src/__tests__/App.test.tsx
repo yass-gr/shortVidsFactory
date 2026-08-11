@@ -39,7 +39,7 @@ describe('App', () => {
 
   it('navigates to the upload screen when the New project button is clicked', async () => {
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /new project/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /new project/i })[0])
     expect(window.location.hash).toBe('#/new')
     await waitFor(() => expect(screen.getByText('New project')).toBeTruthy())
   })
