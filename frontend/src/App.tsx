@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { AppScreen } from './types'
 import { WindowChrome } from './components/WindowChrome'
 import { SettingsModal } from './components/SettingsModal'
@@ -29,6 +29,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
     const fromHash = routeFromHash()
     return window.location.hash && window.location.hash.length > 1 ? fromHash : initialRoute
   })
+  const saveEditorRef = useRef<(() => void) | null>(null)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [activeProjectTitle, setActiveProjectTitle] = useState<string | null>(null)
@@ -87,7 +88,14 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
     if (m && m[2] === 'scripts') {
       pageBody = <Scripts projectId={m[1]} onPick={() => navigate('editor', m[1])} />
     } else if (m && m[2] === 'editor') {
-      pageBody = <Editor projectId={m[1]} />
+      pageBody = (
+        <Editor
+          projectId={m[1]}
+          onRegisterSave={(fn) => {
+            saveEditorRef.current = fn
+          }}
+        />
+      )
     } else {
       pageBody = (
         <Projects
@@ -107,7 +115,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
           activeProjectTitle={activeProjectTitle}
           onNavigate={(s) => navigate(s)}
           onNewProjectClick={() => navigate('upload')}
-          onSaveProject={() => showToast('Project changes saved securely to disk!')}
+          onSaveProject={() => saveEditorRef.current?.()}
           onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
