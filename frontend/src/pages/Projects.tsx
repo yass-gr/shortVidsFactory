@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Folder, Plus, Settings, LayoutGrid, List, CheckCircle2,
-  Clock, ArrowRight,
+  Clock, ArrowRight, FileVideo,
 } from 'lucide-react'
 import type { ProjectMeta, ProjectStatus } from '../types'
 import { formatDuration, formatEditedTime } from '../format'
@@ -143,11 +143,17 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
             >
               {/* Card Thumbnail */}
               <div className="relative aspect-video overflow-hidden bg-black/40">
-                <img
-                  src={frameFor(project.id)}
-                  alt={project.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                {project.duration_s != null ? (
+                  <img
+                    src={frameFor(project.id)}
+                    alt={project.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#707477]">
+                    <FileVideo className="w-8 h-8" aria-label="No video uploaded" />
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
 
                 {/* Duration Badge */}
