@@ -42,7 +42,7 @@ export default function Timeline({
     [cuts],
   )
 
-  function startTrim(e: React.MouseEvent<HTMLElement>, index: number, which: 'left' | 'right') {
+  function startTrim(e: React.PointerEvent<HTMLElement>, index: number, which: 'left' | 'right') {
     e.preventDefault()
     e.stopPropagation()
     const cut = cuts[index]
@@ -50,21 +50,36 @@ export default function Timeline({
     const base = which === 'left' ? cut.source_start : cut.source_end
     const startX = e.clientX
     const pxPerSecond = (trackRef.current?.clientWidth || totalDuration) / (totalDuration || 1)
+    const target = e.currentTarget
+    try {
+      target.setPointerCapture(e.pointerId)
+    } catch {
+      /* pointer capture unsupported — document listeners below still work */
+    }
 
-    function onMove(ev: MouseEvent) {
+    function onMove(ev: PointerEvent) {
       const boundary = base + (ev.clientX - startX) / pxPerSecond
       onTrim(index, which, boundary)
     }
     function onUp() {
-      document.body.removeEventListener('mousemove', onMove)
-      document.body.removeEventListener('mouseup', onUp)
+      target.removeEventListener('pointermove', onMove)
+      target.removeEventListener('pointerup', onUp)
+      target.removeEventListener('pointercancel', onUp)
+      document.body.removeEventListener('pointermove', onMove)
+      document.body.removeEventListener('pointerup', onUp)
+      document.body.removeEventListener('pointercancel', onUp)
     }
-    document.body.addEventListener('mousemove', onMove)
-    document.body.addEventListener('mouseup', onUp)
+    // With pointer capture, move/up fire on the target; without it, on the body.
+    target.addEventListener('pointermove', onMove)
+    target.addEventListener('pointerup', onUp)
+    target.addEventListener('pointercancel', onUp)
+    document.body.addEventListener('pointermove', onMove)
+    document.body.addEventListener('pointerup', onUp)
+    document.body.addEventListener('pointercancel', onUp)
   }
 
-  const handleTrimLeft = (index: number) => (e: React.MouseEvent<HTMLElement>) => startTrim(e, index, 'left')
-  const handleTrimRight = (index: number) => (e: React.MouseEvent<HTMLElement>) => startTrim(e, index, 'right')
+  const handleTrimLeft = (index: number) => (e: React.PointerEvent<HTMLElement>) => startTrim(e, index, 'left')
+  const handleTrimRight = (index: number) => (e: React.PointerEvent<HTMLElement>) => startTrim(e, index, 'right')
 
   function beginReorder(e: React.DragEvent<HTMLDivElement>, index: number) {
     e.dataTransfer.effectAllowed = 'move'
@@ -94,6 +109,15 @@ export default function Timeline({
     if (e.key === 'Delete' && canDelete) {
       e.preventDefault()
       onDelete(selectedId)
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault()
+      if (cuts.length === 0) return
+      const delta = e.key === 'ArrowLeft' ? -1 : 1
+      const next = selectedId === null ? (delta > 0 ? 0 : cuts.length - 1) : Math.min(cuts.length - 1, Math.max(0, selectedId + delta))
+      onSelect(next)
+    } else if ((e.key === 'd' || e.key === 'D') && selectedId !== null && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault()
+      onDuplicate(selectedId)
     }
   }
 
@@ -187,7 +211,7 @@ export default function Timeline({
                 data-testid={`trim-left-${index}`}
                 draggable={false}
                 aria-label={`Trim left edge of cut ${index + 1}`}
-                onMouseDown={(e) => {
+                onPointerDown={(e) => {
                   e.stopPropagation()
                   handleTrimLeft(index)(e)
                 }}
@@ -197,7 +221,7 @@ export default function Timeline({
                 data-testid={`trim-right-${index}`}
                 draggable={false}
                 aria-label={`Trim right edge of cut ${index + 1}`}
-                onMouseDown={(e) => {
+                onPointerDown={(e) => {
                   e.stopPropagation()
                   handleTrimRight(index)(e)
                 }}

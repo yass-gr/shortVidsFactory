@@ -248,7 +248,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="bg-[#24282D] text-white px-1.5 py-0.5 rounded border border-white/10 font-mono text-[10px]">
-                    ⌘S
+                    {navigator.platform.toLowerCase().includes('mac') ? '⌘S' : 'Ctrl+S'}
                   </span>
                   <span>Save</span>
                 </div>
