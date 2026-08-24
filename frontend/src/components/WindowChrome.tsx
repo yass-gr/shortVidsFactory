@@ -28,15 +28,8 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
 }) => {
   return (
     <header className="h-[60px] bg-[#111316] border-b border-white/10 px-4 flex items-center justify-between select-none shrink-0 z-50">
-      {/* Left: macOS Controls & Logo */}
+      {/* Left: Logo */}
       <div className="flex items-center gap-4">
-        {/* macOS Window dots */}
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-black/20 hover:opacity-80 cursor-pointer" title="Close" />
-          <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-black/20 hover:opacity-80 cursor-pointer" title="Minimize" />
-          <div className="w-3 h-3 rounded-full bg-[#27C93F] border border-black/20 hover:opacity-80 cursor-pointer" title="Maximize" />
-        </div>
-
         {/* Brand identity */}
         <div
           className="flex items-center gap-2 cursor-pointer group pl-2"
@@ -49,40 +42,6 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
             ShortVidsFactory
           </span>
           <span className="text-[11px] text-[#707477] font-mono">v1.0.0</span>
-        </div>
-
-        {/* Screen Shortcut Bar (for easy testing & quick navigation across all 5 screens) */}
-        <div className="hidden lg:flex items-center gap-1 bg-[#191C20] p-1 rounded-lg border border-white/5 ml-4 text-xs text-[#A7A9A8]">
-          <button
-            onClick={() => onNavigate('projects')}
-            className={`px-2.5 py-1 rounded-md transition-all ${currentScreen === 'projects' ? 'bg-[#D5FF3F] text-black font-semibold shadow-sm' : 'hover:text-white hover:bg-white/5'}`}
-          >
-            Projects
-          </button>
-          <button
-            onClick={() => onNavigate('upload')}
-            className={`px-2.5 py-1 rounded-md transition-all ${currentScreen === 'upload' ? 'bg-[#D5FF3F] text-black font-semibold shadow-sm' : 'hover:text-white hover:bg-white/5'}`}
-          >
-            Upload
-          </button>
-          <button
-            onClick={() => onNavigate('scripts')}
-            className={`px-2.5 py-1 rounded-md transition-all ${currentScreen === 'scripts' ? 'bg-[#D5FF3F] text-black font-semibold shadow-sm' : 'hover:text-white hover:bg-white/5'}`}
-          >
-            Scripts
-          </button>
-          <button
-            onClick={() => onNavigate('editor')}
-            className={`px-2.5 py-1 rounded-md transition-all ${currentScreen === 'editor' ? 'bg-[#D5FF3F] text-black font-semibold shadow-sm' : 'hover:text-white hover:bg-white/5'}`}
-          >
-            Editor
-          </button>
-          <button
-            onClick={() => onNavigate('exporting')}
-            className={`px-2.5 py-1 rounded-md transition-all ${currentScreen === 'exporting' ? 'bg-[#D5FF3F] text-black font-semibold shadow-sm' : 'hover:text-white hover:bg-white/5'}`}
-          >
-            Exporting
-          </button>
         </div>
       </div>
 

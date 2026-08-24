@@ -117,6 +117,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
             saveEditorRef.current = fn
           }}
           onNavigateExport={navigateExport}
+          onBack={() => navigate('scripts', m[1])}
         />
       )
     } else {
@@ -131,8 +132,8 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   }
 
   return (
-    <div className="w-screen h-screen bg-[#0D0F11] flex flex-col justify-center items-center overflow-hidden font-sans antialiased text-[#F5F5F2] p-0 md:p-3">
-      <div className="w-full h-full max-w-[1600px] max-h-[1000px] bg-[#111316] border border-white/10 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+    <div className="w-screen h-screen bg-[#0D0F11] flex flex-col overflow-hidden font-sans antialiased text-[#F5F5F2] p-0">
+      <div className="w-full h-full bg-[#111316] flex flex-col overflow-hidden relative">
         <WindowChrome
           currentScreen={currentScreen}
           activeProjectTitle={activeProjectTitle}
