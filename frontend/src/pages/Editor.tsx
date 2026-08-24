@@ -24,11 +24,12 @@ const DEFAULT_FONT = () => localStorage.getItem('svf_default_font') ?? 'Arial'
 interface EditorProps {
   projectId: string
   onRegisterSave?: (fn: () => void) => void
+  onDirtyChange?: (dirty: boolean) => void
   onNavigateExport?: (projectId: string, jobId: string, destination: string) => void
   onBack?: () => void
 }
 
-export default function Editor({ projectId, onRegisterSave, onNavigateExport, onBack }: EditorProps) {
+export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNavigateExport, onBack }: EditorProps) {
   const [state, dispatch] = useTimelineReducer([])
   const [font, setFont] = useState<string>(() => DEFAULT_FONT())
   const [music, setMusic] = useState<SnapshotMusic | null>(null)
@@ -87,6 +88,10 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
   useEffect(() => {
     onRegisterSave?.(handleSave)
   }, [onRegisterSave, handleSave])
+
+  useEffect(() => {
+    onDirtyChange?.(hasUnsavedChanges)
+  }, [onDirtyChange, hasUnsavedChanges])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
