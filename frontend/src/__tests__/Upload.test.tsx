@@ -48,6 +48,20 @@ describe('Upload', () => {
     expect(button.disabled).toBe(true)
   })
 
+  it('selects a dropped video file and rejects non-video drops', () => {
+    render(<Upload onUploaded={vi.fn()} />)
+    const dropzone = screen.getByTestId('dropzone')
+    const videoFile = new File(['v'], 'clip.mp4', { type: 'video/mp4' })
+    fireEvent.drop(dropzone, { dataTransfer: { files: [videoFile] } })
+    expect(screen.getByText('clip.mp4')).toBeTruthy()
+
+    // Remove it, then drop a non-video
+    fireEvent.click(screen.getByRole('button', { name: /remove file/i }))
+    const badFile = new File(['x'], 'notes.txt', { type: 'text/plain' })
+    fireEvent.drop(dropzone, { dataTransfer: { files: [badFile] } })
+    expect(screen.getByRole('alert').textContent).toMatch(/not a video/i)
+  })
+
   it('shows progress while processing', async () => {
     apiMock.createProject.mockResolvedValue({ id: 'p2', name: 'demo' })
     apiMock.uploadVideo.mockResolvedValue({ project_id: 'p2', job_id: 'j2', media: {} })

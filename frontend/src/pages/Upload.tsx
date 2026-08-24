@@ -27,11 +27,26 @@ export default function Upload({ onUploaded }: UploadProps) {
   const [status, setStatus] = useState<'idle' | 'processing' | 'done'>('idle')
   const [progressPercent, setProgressPercent] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handlePickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files?.[0] ?? null)
     setError(null)
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      if (!file.type.startsWith('video/')) {
+        setError('That file is not a video. Supported: MP4, MOV, MKV, WebM.')
+        return
+      }
+      setSelectedFile(file)
+      setError(null)
+    }
   }
 
   const handleStartProcessing = async () => {
@@ -206,7 +221,16 @@ export default function Upload({ onUploaded }: UploadProps) {
             {!selectedFile ? (
               <div
                 onClick={() => inputRef.current?.click()}
-                className="border-2 border-dashed border-white/20 hover:border-[#D5FF3F] bg-[#111316]/60 rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-4 cursor-pointer transition-all group"
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setIsDragOver(true)
+                }}
+                onDragLeave={() => setIsDragOver(false)}
+                onDrop={handleDrop}
+                data-testid="dropzone"
+                className={`border-2 border-dashed bg-[#111316]/60 rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-4 cursor-pointer transition-all group ${
+                  isDragOver ? 'border-[#D5FF3F] bg-[#D5FF3F]/5' : 'border-white/20 hover:border-[#D5FF3F]'
+                }`}
               >
                 <div className="w-14 h-14 rounded-2xl bg-[#D5FF3F]/10 border border-[#D5FF3F]/30 text-[#D5FF3F] flex items-center justify-center group-hover:scale-110 transition-transform">
                   <UploadCloud className="w-7 h-7" />
@@ -233,7 +257,7 @@ export default function Upload({ onUploaded }: UploadProps) {
                   </div>
                 </div>
                 {status === 'idle' && (
-                  <button type="button" onClick={() => setSelectedFile(null)} className="p-1.5 rounded-lg text-[#707477] hover:text-white hover:bg-white/10 transition-colors">
+                  <button type="button" onClick={() => setSelectedFile(null)} aria-label="Remove file" className="p-1.5 rounded-lg text-[#707477] hover:text-white hover:bg-white/10 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 )}
