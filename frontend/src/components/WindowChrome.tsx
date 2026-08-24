@@ -1,5 +1,5 @@
 import React from 'react'
-import { Clapperboard, Edit2, ArrowLeft, Plus, MoreHorizontal, Check } from 'lucide-react'
+import { Clapperboard, ArrowLeft, Plus, MoreHorizontal, Check } from 'lucide-react'
 import type { AppScreen } from '../types'
 
 interface WindowChromeProps {
@@ -49,7 +49,6 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
       {currentScreen !== 'projects' && activeProjectTitle && (
         <div className="hidden md:flex items-center gap-2 text-sm text-[#F5F5F2] font-medium bg-[#191C20] px-3 py-1.5 rounded-lg border border-white/5">
           <span>{activeProjectTitle}</span>
-          <Edit2 className="w-3.5 h-3.5 text-[#707477] hover:text-[#D5FF3F] cursor-pointer transition-colors" />
         </div>
       )}
 

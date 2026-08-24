@@ -156,16 +156,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
         </div>
 
         {/* Need Help Footer Link */}
-        <div className="pt-4 border-t border-white/10">
-          <a
-            href="#help"
-            onClick={(e) => e.preventDefault()}
-            className="flex items-center justify-between text-xs text-[#707477] hover:text-white transition-colors"
-          >
-            <span>Need help? Read our export guide</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
+        <div className="pt-4 border-t border-white/10" />
       </aside>
 
       {/* MIDDLE PANEL: Export Status, Progress & Live Logs */}

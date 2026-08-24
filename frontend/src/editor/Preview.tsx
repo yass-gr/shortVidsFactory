@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Play, Pause, Volume2, Maximize2 } from 'lucide-react'
+import { Play, Pause } from 'lucide-react'
 import type { Cut } from './useTimelineReducer'
 
 function formatTime(seconds: number): string {
@@ -132,9 +132,6 @@ export default function Preview({ projectId, cuts = [] }: PreviewProps) {
             aria-label="Seek"
             className="flex-1 cursor-pointer"
           />
-
-          <Volume2 className="w-4 h-4 text-[#A7A9A8] hover:text-white cursor-pointer" />
-          <Maximize2 className="w-4 h-4 text-[#A7A9A8] hover:text-white cursor-pointer" />
         </div>
       </div>
     </div>

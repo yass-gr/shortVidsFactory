@@ -82,9 +82,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 onChange={(e) => setExportFolder(e.target.value)}
                 className="flex-1 bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none font-mono"
               />
-              <button className="bg-[#24282D] hover:bg-white/10 text-white text-xs font-semibold px-4 rounded-xl border border-white/10 transition-colors">
-                Browse
-              </button>
             </div>
           </div>
 
