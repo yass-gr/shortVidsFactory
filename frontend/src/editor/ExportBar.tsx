@@ -8,7 +8,7 @@ function defaultDestination(exportPath: string) {
     const idx = exportPath.lastIndexOf('/')
     if (idx > 0) return exportPath.slice(0, idx)
   }
-  return '/tmp'
+  return localStorage.getItem('svf_export_folder') ?? '~/Videos'
 }
 
 interface ExportBarProps {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   CheckCircle2, Loader2, ArrowLeft, FileText, Sparkles, Folder,
-  Trash2, ExternalLink, ChevronUp, ChevronDown, Check,
+  ExternalLink, ChevronUp, ChevronDown, Check,
 } from 'lucide-react'
 import { pollJob, revealDirectory } from '../api'
 import type { JobEvent } from '../types'
@@ -326,11 +326,15 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
                 </p>
                 <button
                   onClick={onBack}
-                  className="w-full py-2 rounded-xl border border-[#FF5B63]/40 text-[#FF5B63] hover:bg-[#FF5B63]/10 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  title="The export keeps running in the background"
+                  className="w-full py-2 rounded-xl border border-white/10 text-[#A7A9A8] hover:bg-white/5 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Cancel export</span>
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to editor</span>
                 </button>
+                <p className="text-[10px] text-[#707477] text-center">
+                  Export continues in the background.
+                </p>
               </div>
             )}
 
