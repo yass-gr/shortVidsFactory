@@ -44,7 +44,7 @@ export default function ExportBar({ projectId, snapshot, enabled, onNavigateExpo
   return (
     <footer className="bg-[#14171A] border-t border-white/10 p-3.5 px-6 flex flex-wrap items-center justify-between gap-3 shrink-0 z-40">
       <div className="flex items-center gap-3 flex-1 max-w-md min-w-[260px]">
-        <span className="text-xs font-semibold text-[#A7A9A8]">Export:</span>
+        <span className="text-xs font-semibold text-[#B4B6B5]">Export:</span>
         <div className="flex-1 bg-[#191C20] border border-white/10 rounded-xl px-3 py-1.5 flex items-center text-xs text-white">
           <input
             type="text"
@@ -53,11 +53,11 @@ export default function ExportBar({ projectId, snapshot, enabled, onNavigateExpo
             onChange={(e) => setDestination(e.target.value)}
             className="bg-transparent w-full font-mono text-xs text-white outline-none border-none"
           />
-          <Folder className="w-4 h-4 text-[#707477] ml-2 shrink-0 cursor-pointer hover:text-white" />
+          <Folder className="w-4 h-4 text-[#8A8F94] ml-2 shrink-0 cursor-pointer hover:text-white" />
         </div>
       </div>
 
-      <div className="hidden md:flex items-center gap-3 text-xs text-[#A7A9A8]">
+      <div className="hidden md:flex items-center gap-3 text-xs text-[#B4B6B5]">
         <span className="text-[#D5FF3F] font-semibold">Ready to export</span>
         <span>•</span>
         <span className="font-mono text-white">MP4 • 1080×1920 • H.264</span>

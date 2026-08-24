@@ -90,7 +90,7 @@ export default function Upload({ onUploaded }: UploadProps) {
         <div className="space-y-8">
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight">New project</h2>
-            <p className="text-xs text-[#707477] mt-1">
+            <p className="text-xs text-[#8A8F94] mt-1">
               Convert long videos into vertical short clips.
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function Upload({ onUploaded }: UploadProps) {
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-white">Upload video</h4>
-                <p className="text-xs text-[#707477]">Select source MP4/MOV file</p>
+                <p className="text-xs text-[#8A8F94]">Select source MP4/MOV file</p>
               </div>
             </div>
 
@@ -117,15 +117,15 @@ export default function Upload({ onUploaded }: UploadProps) {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                 stepFilled(15)
                   ? 'bg-[#D5FF3F] text-black ring-4 ring-[#D5FF3F]/20'
-                  : 'bg-[#191C20] text-[#707477] border border-white/10'
+                  : 'bg-[#191C20] text-[#8A8F94] border border-white/10'
               }`}>
                 2
               </div>
               <div>
-                <h4 className={`text-sm font-semibold ${stepFilled(15) ? 'text-white' : 'text-[#707477]'}`}>
+                <h4 className={`text-sm font-semibold ${stepFilled(15) ? 'text-white' : 'text-[#8A8F94]'}`}>
                   Transcribing
                 </h4>
-                <p className="text-xs text-[#707477]">Whisper AI speech-to-text</p>
+                <p className="text-xs text-[#8A8F94]">Whisper AI speech-to-text</p>
               </div>
             </div>
 
@@ -134,26 +134,26 @@ export default function Upload({ onUploaded }: UploadProps) {
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                 stepFilled(80)
                   ? 'bg-[#D5FF3F] text-black ring-4 ring-[#D5FF3F]/20'
-                  : 'bg-[#191C20] text-[#707477] border border-white/10'
+                  : 'bg-[#191C20] text-[#8A8F94] border border-white/10'
               }`}>
                 3
               </div>
               <div>
-                <h4 className={`text-sm font-semibold ${stepFilled(80) ? 'text-white' : 'text-[#707477]'}`}>
+                <h4 className={`text-sm font-semibold ${stepFilled(80) ? 'text-white' : 'text-[#8A8F94]'}`}>
                   Writing scripts
                 </h4>
-                <p className="text-xs text-[#707477]">AI is crafting short hooks</p>
+                <p className="text-xs text-[#8A8F94]">AI is crafting short hooks</p>
               </div>
             </div>
 
             {/* Step 4 */}
             <div className="flex items-start gap-3 relative z-10">
-              <div className="w-8 h-8 rounded-full bg-[#191C20] text-[#707477] border border-white/10 flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-[#191C20] text-[#8A8F94] border border-white/10 flex items-center justify-center text-xs font-bold">
                 4
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-[#707477]">Editor</h4>
-                <p className="text-xs text-[#707477]">Pick a script to continue</p>
+                <h4 className="text-sm font-semibold text-[#8A8F94]">Editor</h4>
+                <p className="text-xs text-[#8A8F94]">Pick a script to continue</p>
               </div>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function Upload({ onUploaded }: UploadProps) {
             <Lightbulb className="w-4 h-4" />
             <span>Tip</span>
           </div>
-          <p className="text-xs text-[#A7A9A8] leading-relaxed">
+          <p className="text-xs text-[#B4B6B5] leading-relaxed">
             For best results, pick a spoken-word video like a podcast, interview, or vlog with clear speech.
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function Upload({ onUploaded }: UploadProps) {
       <main className="flex-1 overflow-y-auto p-10 flex flex-col justify-center max-w-3xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Create a short video project</h1>
-          <p className="text-sm text-[#A7A9A8] mt-1">
+          <p className="text-sm text-[#B4B6B5] mt-1">
             Give your project a name and upload your video to generate AI scripts.
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function Upload({ onUploaded }: UploadProps) {
         <div className="space-y-6 bg-[#191C20] p-8 rounded-3xl border border-white/10">
           {/* Project Name Input */}
           <div className="space-y-2">
-            <label htmlFor="project-name" className="text-xs font-semibold uppercase tracking-wider text-[#A7A9A8]">
+            <label htmlFor="project-name" className="text-xs font-semibold uppercase tracking-wider text-[#B4B6B5]">
               1. Project name
             </label>
             <input
@@ -208,13 +208,13 @@ export default function Upload({ onUploaded }: UploadProps) {
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               placeholder="e.g. Creativity Talk – Plant Edition"
-              className="w-full bg-[#111316] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-sm text-white placeholder-[#707477] outline-none transition-colors"
+              className="w-full bg-[#111316] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-sm text-white placeholder-[#8A8F94] outline-none transition-colors"
             />
           </div>
 
           {/* Video Picker / Dropzone */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#A7A9A8]">
+            <label className="text-xs font-semibold uppercase tracking-wider text-[#B4B6B5]">
               2. Upload video file
             </label>
 
@@ -239,7 +239,7 @@ export default function Upload({ onUploaded }: UploadProps) {
                   <p className="text-sm font-semibold text-white">
                     Drag & drop your video here or <span className="text-[#D5FF3F] underline">Browse files</span>
                   </p>
-                  <p className="text-xs text-[#707477] mt-1">
+                  <p className="text-xs text-[#8A8F94] mt-1">
                     Supports MP4, MOV, MKV, WebM • Max size 4 GB
                   </p>
                 </div>
@@ -253,11 +253,11 @@ export default function Upload({ onUploaded }: UploadProps) {
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold text-white">{selectedFile.name}</h4>
-                    <p className="text-xs text-[#707477]">{formatBytes(selectedFile.size)}</p>
+                    <p className="text-xs text-[#8A8F94]">{formatBytes(selectedFile.size)}</p>
                   </div>
                 </div>
                 {status === 'idle' && (
-                  <button type="button" onClick={() => setSelectedFile(null)} aria-label="Remove file" className="p-1.5 rounded-lg text-[#707477] hover:text-white hover:bg-white/10 transition-colors">
+                  <button type="button" onClick={() => setSelectedFile(null)} aria-label="Remove file" className="p-1.5 rounded-lg text-[#8A8F94] hover:text-white hover:bg-white/10 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 )}

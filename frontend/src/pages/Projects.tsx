@@ -61,18 +61,18 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
 
             <button
               onClick={onNewProjectClick}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#A7A9A8] hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#B4B6B5] hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
             >
               <div className="flex items-center gap-3">
                 <Plus className="w-4 h-4" />
                 <span>New project</span>
               </div>
-              <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] text-[#707477]">+</span>
+              <span className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] text-[#8A8F94]">+</span>
             </button>
 
             <button
               onClick={onOpenSettings}
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#A7A9A8] hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#B4B6B5] hover:text-white hover:bg-white/5 transition-colors text-sm font-medium"
             >
               <Settings className="w-4 h-4" />
               <span>Settings</span>
@@ -84,7 +84,7 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
         <div className="flex items-center gap-3 bg-[#191C20] p-3 rounded-xl border border-white/5">
           <div className="flex-1 min-w-0">
             <div className="text-xs font-semibold text-white">Local workspace</div>
-            <p className="text-[11px] text-[#707477] truncate">All projects saved on this machine</p>
+            <p className="text-[11px] text-[#8A8F94] truncate">All projects saved on this machine</p>
           </div>
         </div>
       </aside>
@@ -95,7 +95,7 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">Projects</h1>
-            <p className="text-sm text-[#A7A9A8] mt-1">
+            <p className="text-sm text-[#B4B6B5] mt-1">
               Pick up where you left off or start a new project.
             </p>
           </div>
@@ -106,14 +106,14 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
             <div className="flex items-center bg-[#191C20] p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#24282D] text-[#D5FF3F]' : 'text-[#707477] hover:text-white'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#24282D] text-[#D5FF3F]' : 'text-[#8A8F94] hover:text-white'}`}
                 title="Grid view"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#24282D] text-[#D5FF3F]' : 'text-[#707477] hover:text-white'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#24282D] text-[#D5FF3F]' : 'text-[#8A8F94] hover:text-white'}`}
                 title="List view"
               >
                 <List className="w-4 h-4" />
@@ -131,10 +131,63 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
             </button>
           </div>
         )}
-        {projects === null && !error && <p className="text-sm text-[#A7A9A8]">Loading…</p>}
-        {projects && projects.length === 0 && <p className="text-sm text-[#A7A9A8]">No projects yet. Create your first one below.</p>}
+        {projects === null && !error && <p className="text-sm text-[#B4B6B5]">Loading…</p>}
+        {projects && projects.length === 0 && <p className="text-sm text-[#B4B6B5]">No projects yet. Create your first one below.</p>}
 
-        {/* Projects Cards Grid */}
+        {/* Projects Cards: Grid or List */}
+        {viewMode === 'list' && (projects ?? []).length > 0 && (
+          <div className="space-y-2">
+            {(projects ?? []).map((project) => (
+              <div
+                key={project.id}
+                className="bg-[#191C20] border border-white/10 rounded-2xl p-3 flex items-center gap-4 hover:border-white/20 transition-all group"
+              >
+                <div className="w-24 aspect-video rounded-lg overflow-hidden bg-black/40 shrink-0">
+                  {project.duration_s != null ? (
+                    <img src={frameFor(project.id)} alt={project.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[#8A8F94]">
+                      <FileVideo className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm text-white truncate group-hover:text-[#D5FF3F] transition-colors">
+                    {project.name}
+                  </h3>
+                  <p className="text-xs text-[#8A8F94] mt-0.5">
+                    Edited • {formatEditedTime(project.edited_at)} • {formatDuration(project.duration_s ?? 0)}
+                  </p>
+                </div>
+                {project.status === 'ready' && (
+                  <span className="flex items-center gap-1.5 text-xs text-[#D5FF3F] bg-[#D5FF3F]/10 px-2.5 py-1 rounded-full border border-[#D5FF3F]/20 font-medium shrink-0">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Ready
+                  </span>
+                )}
+                {project.status === 'processing' && (
+                  <span className="flex items-center gap-1.5 text-xs text-[#FFB13B] bg-[#FFB13B]/10 px-2.5 py-1 rounded-full border border-[#FFB13B]/20 font-medium animate-pulse shrink-0">
+                    <Clock className="w-3.5 h-3.5" /> Processing
+                  </span>
+                )}
+                {project.status === 'draft' && (
+                  <span className="flex items-center gap-1.5 text-xs text-[#B4B6B5] bg-white/5 px-2.5 py-1 rounded-full border border-white/10 font-medium shrink-0">
+                    Draft
+                  </span>
+                )}
+                <button
+                  onClick={() => onSelectProject(project)}
+                  className="flex items-center gap-1.5 bg-[#24282D] hover:bg-[#D5FF3F] hover:text-black text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shrink-0"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* New Project CTA Card — grid mode only, inline after cards; list mode gets a button row */}
+        {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(projects ?? []).map((project) => (
             <div
@@ -150,7 +203,7 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#707477]">
+                  <div className="w-full h-full flex items-center justify-center text-[#8A8F94]">
                     <FileVideo className="w-8 h-8" aria-label="No video uploaded" />
                   </div>
                 )}
@@ -168,7 +221,7 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
                   <h3 className="font-semibold text-base text-white group-hover:text-[#D5FF3F] transition-colors">
                     {project.name}
                   </h3>
-                  <p className="text-xs text-[#707477] mt-1">
+                  <p className="text-xs text-[#8A8F94] mt-1">
                     Edited • {formatEditedTime(project.edited_at)}
                   </p>
                 </div>
@@ -189,8 +242,8 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
                     </span>
                   )}
                   {project.status === 'draft' && (
-                    <span className="flex items-center gap-1.5 text-xs text-[#A7A9A8] bg-white/5 px-2.5 py-1 rounded-full border border-white/10 font-medium">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#707477]" />
+                    <span className="flex items-center gap-1.5 text-xs text-[#B4B6B5] bg-white/5 px-2.5 py-1 rounded-full border border-white/10 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#8A8F94]" />
                       Draft
                     </span>
                   )}
@@ -213,12 +266,12 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
             onClick={onNewProjectClick}
             className="border-2 border-dashed border-white/15 hover:border-[#FF5B63]/60 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-4 bg-[#191C20]/40 hover:bg-[#191C20] transition-all cursor-pointer min-h-[260px] group"
           >
-            <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-[#FF5B63]/20 text-[#A7A9A8] group-hover:text-[#FF5B63] flex items-center justify-center transition-all">
+            <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-[#FF5B63]/20 text-[#B4B6B5] group-hover:text-[#FF5B63] flex items-center justify-center transition-all">
               <Plus className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-semibold text-white text-base">New project</h3>
-              <p className="text-xs text-[#707477] mt-1 max-w-[200px]">
+              <p className="text-xs text-[#8A8F94] mt-1 max-w-[200px]">
                 Import a video and let AI turn it into short clips.
               </p>
             </div>
@@ -230,6 +283,7 @@ export const Projects: React.FC<ProjectsScreenProps> = ({
             </button>
           </div>
         </div>
+        )}
       </main>
     </div>
   )

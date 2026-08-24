@@ -151,7 +151,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
             <button
               type="button"
               onClick={() => onBack?.()}
-              className="flex items-center gap-2 text-xs text-[#707477] hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-xs text-[#8A8F94] hover:text-white transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to scripts</span>
@@ -159,12 +159,12 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
 
             {/* Timeline Summary (real computed values) */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+              <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                 Timeline
               </span>
               <div className="flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+                  <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                     Duration
                   </span>
                   <div className="text-lg font-black text-white tracking-tight font-mono">
@@ -172,7 +172,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+                  <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                     Cuts
                   </span>
                   <div className="text-lg font-black text-[#D5FF3F] tracking-tight">
@@ -180,7 +180,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
                   </div>
                 </div>
               </div>
-              <p className="text-[11px] text-[#A7A9A8]">
+              <p className="text-[11px] text-[#B4B6B5]">
                 {cuts.length} cut{cuts.length === 1 ? '' : 's'} • 9:16 • 1080×1920 MP4
               </p>
             </div>
@@ -188,7 +188,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
             {/* Video Format Info Box */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-3">
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider">
                   Aspect ratio
                 </span>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white">
@@ -198,7 +198,7 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
               </div>
 
               <div className="space-y-1 pt-2 border-t border-white/5">
-                <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider">
                   Output
                 </span>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white">
@@ -224,10 +224,10 @@ export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNav
 
             {/* Keyboard Shortcuts Box */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+              <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                 Keyboard shortcuts
               </span>
-              <div className="space-y-2 text-[11px] text-[#A7A9A8]">
+              <div className="space-y-2 text-[11px] text-[#B4B6B5]">
                 <div className="flex items-center justify-between">
                   <span className="bg-[#24282D] text-white px-1.5 py-0.5 rounded border border-white/10 font-mono text-[10px]">
                     Del

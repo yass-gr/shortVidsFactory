@@ -126,7 +126,7 @@ export default function Timeline({
       <div className="flex items-center justify-between mb-2">
         <div>
           <h4 className="text-sm font-bold text-white">Timeline</h4>
-          <p className="text-[11px] text-[#707477]">Drag to reorder. Drag edges to trim.</p>
+          <p className="text-[11px] text-[#8A8F94]">Drag to reorder. Drag edges to trim.</p>
         </div>
         <div className="flex items-center gap-2">
           <button

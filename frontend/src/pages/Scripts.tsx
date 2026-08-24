@@ -114,7 +114,7 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
             </div>
             <div className="p-3 space-y-1">
               <h4 className="text-xs font-semibold text-white truncate">Project {projectId}</h4>
-              <p className="text-[11px] text-[#707477] truncate">
+              <p className="text-[11px] text-[#8A8F94] truncate">
                 Source video: {projectId}
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
               </div>
               <div>
                 <h5 className="text-xs font-semibold text-white">Upload</h5>
-                <p className="text-[10px] text-[#707477]">Completed</p>
+                <p className="text-[10px] text-[#8A8F94]">Completed</p>
               </div>
             </div>
 
@@ -140,7 +140,7 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
               </div>
               <div>
                 <h5 className="text-xs font-semibold text-white">Transcribing</h5>
-                <p className="text-[10px] text-[#707477]">Completed (100%)</p>
+                <p className="text-[10px] text-[#8A8F94]">Completed (100%)</p>
               </div>
             </div>
 
@@ -151,18 +151,18 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
               </div>
               <div>
                 <h5 className="text-xs font-semibold text-[#D5FF3F]">Writing scripts</h5>
-                <p className="text-[10px] text-[#A7A9A8]">AI is crafting ideas</p>
+                <p className="text-[10px] text-[#B4B6B5]">AI is crafting ideas</p>
               </div>
             </div>
 
             {/* Step 4 */}
             <div className="flex items-center gap-3 relative z-10">
-              <div className="w-7 h-7 rounded-full bg-[#191C20] text-[#707477] border border-white/10 flex items-center justify-center text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-[#191C20] text-[#8A8F94] border border-white/10 flex items-center justify-center text-xs font-bold">
                 4
               </div>
               <div>
-                <h5 className="text-xs font-semibold text-[#707477]">Editor</h5>
-                <p className="text-[10px] text-[#707477]">Pick a script to continue</p>
+                <h5 className="text-xs font-semibold text-[#8A8F94]">Editor</h5>
+                <p className="text-[10px] text-[#8A8F94]">Pick a script to continue</p>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
             <Lightbulb className="w-3.5 h-3.5" />
             <span>Tip</span>
           </div>
-          <p className="text-[11px] text-[#A7A9A8] leading-relaxed">
+          <p className="text-[11px] text-[#B4B6B5] leading-relaxed">
             Each script is designed for a 15–30 second short. Pick the one that fits your audience best.
           </p>
         </div>
@@ -187,13 +187,13 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white">Choose a script</h1>
-              <p className="text-sm text-[#A7A9A8] mt-1">
+              <p className="text-sm text-[#B4B6B5] mt-1">
                 We've generated up to 3 short-video scripts. Pick the one you like best.
               </p>
             </div>
 
             {/* Top Right Info Notice Box */}
-            <div className="hidden xl:flex items-center gap-2 bg-[#191C20] border border-white/10 px-3.5 py-2 rounded-xl text-xs text-[#A7A9A8]">
+            <div className="hidden xl:flex items-center gap-2 bg-[#191C20] border border-white/10 px-3.5 py-2 rounded-xl text-xs text-[#B4B6B5]">
               <Info className="w-4 h-4 text-[#D5FF3F] shrink-0" />
               <span>Scripts are based on the transcript of your video and optimized for short-form engagement.</span>
             </div>
@@ -212,9 +212,9 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
             </div>
           )}
 
-          {scripts === null && !error && <p className="text-sm text-[#A7A9A8]">Loading…</p>}
+          {scripts === null && !error && <p className="text-sm text-[#B4B6B5]">Loading…</p>}
 
-          {scripts && scripts.length === 0 && !error && <p className="text-sm text-[#A7A9A8]">No scripts yet.</p>}
+          {scripts && scripts.length === 0 && !error && <p className="text-sm text-[#B4B6B5]">No scripts yet.</p>}
 
           {scripts && scripts.length > 0 && (
             <>
@@ -252,10 +252,10 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
                       </div>
 
                       {/* Summary */}
-                      <p className="text-xs text-[#A7A9A8] leading-relaxed line-clamp-3">{script.summary}</p>
+                      <p className="text-xs text-[#B4B6B5] leading-relaxed line-clamp-3">{script.summary}</p>
 
                       {/* Stats footer */}
-                      <div className="grid grid-cols-3 gap-1 pt-3 border-t border-white/5 text-[11px] text-[#707477]">
+                      <div className="grid grid-cols-3 gap-1 pt-3 border-t border-white/5 text-[11px] text-[#8A8F94]">
                         <div className="flex items-center gap-1"><FileText className="w-3.5 h-3.5" /><span>{script.words_used} words</span></div>
                         <div className="flex items-center gap-1 justify-center"><Clock className="w-3.5 h-3.5" /><span>{formatDuration(script.duration_s)}</span></div>
                         <div className="flex items-center gap-1 justify-end"><Scissors className="w-3.5 h-3.5" /><span>{script.cuts.length} cut{script.cuts.length === 1 ? '' : 's'}</span></div>
@@ -281,7 +281,7 @@ export default function Scripts({ projectId, onPick }: ScriptsProps) {
 
         {/* Bottom Bar: Regenerate */}
         {scripts && scripts.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10 text-xs text-[#707477]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10 text-xs text-[#8A8F94]">
             <div className="flex items-center gap-2">
               <Info className="w-4 h-4 text-[#D5FF3F]" />
               <span>You can always regenerate scripts if you want different ideas.</span>

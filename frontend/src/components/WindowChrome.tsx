@@ -41,7 +41,7 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
           <span className="font-bold text-white text-sm tracking-tight group-hover:text-[#D5FF3F] transition-colors">
             ShortVidsFactory
           </span>
-          <span className="text-[11px] text-[#707477] font-mono">v1.0.0</span>
+          <span className="text-[11px] text-[#8A8F94] font-mono">v1.0.0</span>
         </div>
       </div>
 
@@ -76,7 +76,7 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
 
         {currentScreen === 'editor' && (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs text-[#A7A9A8]">
+            <div className="flex items-center gap-1.5 text-xs text-[#B4B6B5]">
               {hasUnsavedChanges ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
@@ -110,7 +110,7 @@ export const WindowChrome: React.FC<WindowChromeProps> = ({
 
         <button
           onClick={onOpenSettings}
-          className="p-1.5 rounded-lg text-[#707477] hover:text-white hover:bg-white/5 transition-colors"
+          className="p-1.5 rounded-lg text-[#8A8F94] hover:text-white hover:bg-white/5 transition-colors"
           title="More options / Settings"
         >
           <MoreHorizontal className="w-4 h-4" />

@@ -54,13 +54,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">Settings</h3>
-              <p className="text-xs text-[#707477]">Frontend preferences</p>
+              <p className="text-xs text-[#8A8F94]">Frontend preferences</p>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Close settings"
-            className="p-2 rounded-xl text-[#707477] hover:text-white hover:bg-white/10 transition-colors"
+            className="p-2 rounded-xl text-[#8A8F94] hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -70,7 +70,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Default Export Folder */}
           <div className="space-y-2">
-            <label htmlFor="svf-export-folder" className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
+            <label htmlFor="svf-export-folder" className="text-xs font-semibold text-[#B4B6B5] uppercase tracking-wider flex items-center gap-2">
               <Folder className="w-4 h-4 text-[#D5FF3F]" />
               <span>Default Export Folder</span>
             </label>
@@ -80,16 +80,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               value={exportFolder}
               onChange={(e) => setExportFolder(e.target.value)}
               placeholder="~/Videos"
-              className="w-full bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none font-mono placeholder-[#707477]"
+              className="w-full bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none font-mono placeholder-[#8A8F94]"
             />
-            <p className="text-[11px] text-[#707477]">
+            <p className="text-[11px] text-[#8A8F94]">
               Relative paths are resolved under your home directory by the backend.
             </p>
           </div>
 
           {/* Subtitle Font */}
           <div className="space-y-2">
-            <label htmlFor="svf-default-font" className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
+            <label htmlFor="svf-default-font" className="text-xs font-semibold text-[#B4B6B5] uppercase tracking-wider flex items-center gap-2">
               <Sliders className="w-4 h-4 text-[#D5FF3F]" />
               <span>Default Caption Font</span>
             </label>
@@ -105,13 +105,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 </option>
               ))}
             </select>
-            <p className="text-[11px] text-[#707477]">
+            <p className="text-[11px] text-[#8A8F94]">
               Used as the starting font for new editing sessions.
             </p>
           </div>
 
           {/* Note about server-side config */}
-          <div className="p-4 bg-[#191C20] rounded-2xl border border-white/5 text-[11px] text-[#A7A9A8] leading-relaxed">
+          <div className="p-4 bg-[#191C20] rounded-2xl border border-white/5 text-[11px] text-[#B4B6B5] leading-relaxed">
             The Gemini API key and render hardware options are configured on the
             backend via environment variables (e.g. <span className="font-mono text-white">SHORTSVIDS_GEMINI_API_KEY</span>,{' '}
             <span className="font-mono text-white">SHORTSVIDS_FONT_PATH</span>) — not here.

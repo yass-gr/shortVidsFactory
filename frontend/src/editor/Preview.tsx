@@ -81,7 +81,7 @@ export default function Preview({ projectId, cuts = [] }: PreviewProps) {
   return (
     <div>
       <div className="bg-[#14171A] rounded-2xl border border-white/10 p-4 flex flex-col">
-        <div className="flex items-center justify-between mb-2 text-xs text-[#707477]">
+        <div className="flex items-center justify-between mb-2 text-xs text-[#8A8F94]">
           <span className="font-semibold text-white">Preview</span>
           <span className="text-[11px]">Rendered preview (540px wide)</span>
         </div>
