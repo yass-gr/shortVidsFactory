@@ -3,8 +3,9 @@ import { Music, Plus, Sliders, Trash2, Type, Volume2 } from 'lucide-react'
 import type { CaptionLine, Cut, SnapshotMusic } from '../types'
 import { formatTime } from '../format'
 import { getMusic } from '../api'
+import { FONTS } from '../components/SettingsModal'
 
-export const FONTS = ['Arial', 'OpenSans', 'Roboto']
+export { FONTS }
 
 interface MusicOption {
   id: string

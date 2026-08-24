@@ -19,7 +19,7 @@ import {
 } from '../editor/useTimelineReducer'
 import type { CaptionLine } from '../editor/useTimelineReducer'
 
-const DEFAULT_FONT = 'Arial'
+const DEFAULT_FONT = () => localStorage.getItem('svf_default_font') ?? 'Arial'
 
 interface EditorProps {
   projectId: string
@@ -30,7 +30,7 @@ interface EditorProps {
 
 export default function Editor({ projectId, onRegisterSave, onNavigateExport, onBack }: EditorProps) {
   const [state, dispatch] = useTimelineReducer([])
-  const [font, setFont] = useState(DEFAULT_FONT)
+  const [font, setFont] = useState<string>(() => DEFAULT_FONT())
   const [music, setMusic] = useState<SnapshotMusic | null>(null)
   const [exportPath, setExportPath] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -52,7 +52,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
         if (!active) return
         const editorSnap = snap as EditorSnapshot
         dispatch(replaceCuts(editorSnap.cuts || []))
-        setFont(editorSnap.font || DEFAULT_FONT)
+        setFont(editorSnap.font || DEFAULT_FONT())
         setMusic(editorSnap.music ?? null)
         setExportPath(editorSnap.export_path || '')
       })

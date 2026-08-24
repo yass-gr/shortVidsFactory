@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { X, Key, Folder, Sliders, ShieldCheck, Cpu } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { X, Folder, Sliders } from 'lucide-react'
+
+export const FONTS = ['Arial', 'OpenSans', 'Roboto'] as const
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -7,17 +9,23 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('svf_api_key') ?? '')
   const [exportFolder, setExportFolder] = useState(
-    () => localStorage.getItem('svf_export_folder') ?? '/Users/yass/Videos/Exports',
+    () => localStorage.getItem('svf_export_folder') ?? '',
   )
   const [defaultFont, setDefaultFont] = useState(
-    () => localStorage.getItem('svf_default_font') ?? 'OpenSans',
+    () => localStorage.getItem('svf_default_font') ?? 'Arial',
   )
-  const [hardwareAccel, setHardwareAccel] = useState(true)
+
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
 
   const handleSave = () => {
-    localStorage.setItem('svf_api_key', apiKey)
     localStorage.setItem('svf_export_folder', exportFolder)
     localStorage.setItem('svf_default_font', defaultFont)
     onClose()
@@ -26,9 +34,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-[#14171A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl space-y-6">
-        
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={onClose}
+      data-testid="settings-backdrop"
+    >
+      <div
+        className="bg-[#14171A] border border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl space-y-6"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Settings"
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#191C20]">
           <div className="flex items-center gap-3">
@@ -37,11 +54,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">Settings</h3>
-              <p className="text-xs text-[#707477]">Configure AI models, directories & hardware</p>
+              <p className="text-xs text-[#707477]">Frontend preferences</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close settings"
             className="p-2 rounded-xl text-[#707477] hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -50,76 +68,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         {/* Modal Body */}
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-          
-          {/* Gemini API Key */}
+          {/* Default Export Folder */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
-              <Key className="w-4 h-4 text-[#D5FF3F]" />
-              <span>Gemini API Key</span>
-            </label>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Gemini API key"
-              className="w-full bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none"
-            />
-            <p className="text-[11px] text-[#707477]">
-              Used for video transcript analysis and automatic 15-30s script hook generation.
-            </p>
-          </div>
-
-          {/* Export Directory */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
+            <label htmlFor="svf-export-folder" className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
               <Folder className="w-4 h-4 text-[#D5FF3F]" />
               <span>Default Export Folder</span>
             </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={exportFolder}
-                onChange={(e) => setExportFolder(e.target.value)}
-                className="flex-1 bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none font-mono"
-              />
-            </div>
+            <input
+              id="svf-export-folder"
+              type="text"
+              value={exportFolder}
+              onChange={(e) => setExportFolder(e.target.value)}
+              placeholder="~/Videos"
+              className="w-full bg-[#191C20] border border-white/15 focus:border-[#D5FF3F] rounded-xl px-4 py-3 text-xs text-white outline-none font-mono placeholder-[#707477]"
+            />
+            <p className="text-[11px] text-[#707477]">
+              Relative paths are resolved under your home directory by the backend.
+            </p>
           </div>
 
           {/* Subtitle Font */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#D5FF3F]" />
+            <label htmlFor="svf-default-font" className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-[#D5FF3F]" />
               <span>Default Caption Font</span>
             </label>
             <select
+              id="svf-default-font"
               value={defaultFont}
               onChange={(e) => setDefaultFont(e.target.value)}
               className="w-full bg-[#191C20] border border-white/15 rounded-xl px-4 py-3 text-xs text-white outline-none focus:border-[#D5FF3F]"
             >
-              <option value="OpenSans">OpenSans</option>
-              <option value="Arial">Arial</option>
-              <option value="Roboto">Roboto</option>
-              <option value="Inter">Inter</option>
+              {FONTS.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
             </select>
+            <p className="text-[11px] text-[#707477]">
+              Used as the starting font for new editing sessions.
+            </p>
           </div>
 
-          {/* Hardware Acceleration */}
-          <div className="flex items-center justify-between p-4 bg-[#191C20] rounded-2xl border border-white/5">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-white">
-                <Cpu className="w-4 h-4 text-[#D5FF3F]" />
-                <span>GPU Acceleration (H.264 / NVENC)</span>
-              </div>
-              <p className="text-[11px] text-[#707477]">
-                Accelerate 1080x1920 video rendering using local GPU hardware.
-              </p>
-            </div>
-            <input
-              type="checkbox"
-              checked={hardwareAccel}
-              onChange={(e) => setHardwareAccel(e.target.checked)}
-              className="w-5 h-5 accent-[#D5FF3F] cursor-pointer"
-            />
+          {/* Note about server-side config */}
+          <div className="p-4 bg-[#191C20] rounded-2xl border border-white/5 text-[11px] text-[#A7A9A8] leading-relaxed">
+            The Gemini API key and render hardware options are configured on the
+            backend via environment variables (e.g. <span className="font-mono text-white">SHORTSVIDS_GEMINI_API_KEY</span>,{' '}
+            <span className="font-mono text-white">SHORTSVIDS_FONT_PATH</span>) — not here.
           </div>
         </div>
 
