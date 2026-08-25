@@ -19,18 +19,19 @@ import {
 } from '../editor/useTimelineReducer'
 import type { CaptionLine } from '../editor/useTimelineReducer'
 
-const DEFAULT_FONT = 'Arial'
+const DEFAULT_FONT = () => localStorage.getItem('svf_default_font') ?? 'Arial'
 
 interface EditorProps {
   projectId: string
   onRegisterSave?: (fn: () => void) => void
+  onDirtyChange?: (dirty: boolean) => void
   onNavigateExport?: (projectId: string, jobId: string, destination: string) => void
   onBack?: () => void
 }
 
-export default function Editor({ projectId, onRegisterSave, onNavigateExport, onBack }: EditorProps) {
+export default function Editor({ projectId, onRegisterSave, onDirtyChange, onNavigateExport, onBack }: EditorProps) {
   const [state, dispatch] = useTimelineReducer([])
-  const [font, setFont] = useState(DEFAULT_FONT)
+  const [font, setFont] = useState<string>(() => DEFAULT_FONT())
   const [music, setMusic] = useState<SnapshotMusic | null>(null)
   const [exportPath, setExportPath] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -52,7 +53,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
         if (!active) return
         const editorSnap = snap as EditorSnapshot
         dispatch(replaceCuts(editorSnap.cuts || []))
-        setFont(editorSnap.font || DEFAULT_FONT)
+        setFont(editorSnap.font || DEFAULT_FONT())
         setMusic(editorSnap.music ?? null)
         setExportPath(editorSnap.export_path || '')
       })
@@ -87,6 +88,10 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
   useEffect(() => {
     onRegisterSave?.(handleSave)
   }, [onRegisterSave, handleSave])
+
+  useEffect(() => {
+    onDirtyChange?.(hasUnsavedChanges)
+  }, [onDirtyChange, hasUnsavedChanges])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -146,7 +151,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
             <button
               type="button"
               onClick={() => onBack?.()}
-              className="flex items-center gap-2 text-xs text-[#707477] hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-xs text-[#8A8F94] hover:text-white transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to scripts</span>
@@ -154,12 +159,12 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
 
             {/* Timeline Summary (real computed values) */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+              <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                 Timeline
               </span>
               <div className="flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+                  <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                     Duration
                   </span>
                   <div className="text-lg font-black text-white tracking-tight font-mono">
@@ -167,7 +172,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+                  <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                     Cuts
                   </span>
                   <div className="text-lg font-black text-[#D5FF3F] tracking-tight">
@@ -175,7 +180,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
                   </div>
                 </div>
               </div>
-              <p className="text-[11px] text-[#A7A9A8]">
+              <p className="text-[11px] text-[#B4B6B5]">
                 {cuts.length} cut{cuts.length === 1 ? '' : 's'} • 9:16 • 1080×1920 MP4
               </p>
             </div>
@@ -183,7 +188,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
             {/* Video Format Info Box */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-3">
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider">
                   Aspect ratio
                 </span>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white">
@@ -193,7 +198,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
               </div>
 
               <div className="space-y-1 pt-2 border-t border-white/5">
-                <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider">
                   Output
                 </span>
                 <div className="flex items-center gap-2 text-xs font-semibold text-white">
@@ -219,10 +224,10 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
 
             {/* Keyboard Shortcuts Box */}
             <div className="bg-[#191C20] p-3.5 rounded-2xl border border-white/10 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-[#707477] tracking-wider block">
+              <span className="text-[10px] uppercase font-bold text-[#8A8F94] tracking-wider block">
                 Keyboard shortcuts
               </span>
-              <div className="space-y-2 text-[11px] text-[#A7A9A8]">
+              <div className="space-y-2 text-[11px] text-[#B4B6B5]">
                 <div className="flex items-center justify-between">
                   <span className="bg-[#24282D] text-white px-1.5 py-0.5 rounded border border-white/10 font-mono text-[10px]">
                     Del
@@ -243,7 +248,7 @@ export default function Editor({ projectId, onRegisterSave, onNavigateExport, on
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="bg-[#24282D] text-white px-1.5 py-0.5 rounded border border-white/10 font-mono text-[10px]">
-                    ⌘S
+                    {navigator.platform.toLowerCase().includes('mac') ? '⌘S' : 'Ctrl+S'}
                   </span>
                   <span>Save</span>
                 </div>

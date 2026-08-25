@@ -3,8 +3,9 @@ import { Music, Plus, Sliders, Trash2, Type, Volume2 } from 'lucide-react'
 import type { CaptionLine, Cut, SnapshotMusic } from '../types'
 import { formatTime } from '../format'
 import { getMusic } from '../api'
+import { FONTS } from '../components/SettingsModal'
 
-export const FONTS = ['Arial', 'OpenSans', 'Roboto']
+export { FONTS }
 
 interface MusicOption {
   id: string
@@ -102,7 +103,7 @@ export default function Inspector({
 
   const tabClass = (active: boolean) =>
     `flex-1 py-2.5 flex items-center justify-center gap-2 border-b-2 transition-all cursor-pointer ${
-      active ? 'border-[#D5FF3F] text-[#D5FF3F]' : 'border-transparent text-[#707477] hover:text-white'
+      active ? 'border-[#D5FF3F] text-[#D5FF3F]' : 'border-transparent text-[#8A8F94] hover:text-white'
     }`
 
   return (
@@ -125,7 +126,7 @@ export default function Inspector({
 
         <div className={inspectorTab === 'captions' ? 'space-y-4' : 'hidden space-y-4'}>
           {cut && (
-            <div className="flex items-center justify-between text-xs text-[#707477]">
+            <div className="flex items-center justify-between text-xs text-[#8A8F94]">
               <span>
                 Editing cut ({formatTime(cut.source_start)} – {formatTime(cut.source_end)})
               </span>
@@ -138,7 +139,7 @@ export default function Inspector({
                 key={i}
                 className="flex items-center gap-2 bg-[#191C20] p-2 rounded-xl border border-white/10 hover:border-white/20 transition-colors"
               >
-                <span className="font-mono text-[10px] text-[#707477] bg-[#111316] px-2 py-1.5 rounded border border-white/5">
+                <span className="font-mono text-[10px] text-[#8A8F94] bg-[#111316] px-2 py-1.5 rounded border border-white/5">
                   {formatTime(line.start)}
                 </span>
                 <input
@@ -154,7 +155,7 @@ export default function Inspector({
                   data-testid={`caption-remove-${i}`}
                   onClick={() => handleRemoveCaption(i)}
                   aria-label={`Remove caption ${i + 1}`}
-                  className="p-1 rounded text-[#707477] hover:text-[#FF5B63] transition-colors cursor-pointer"
+                  className="p-1 rounded text-[#8A8F94] hover:text-[#FF5B63] transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -163,7 +164,7 @@ export default function Inspector({
           </div>
 
           {!cut ? (
-            <p className="text-xs text-[#707477]">Select a cut to edit captions.</p>
+            <p className="text-xs text-[#8A8F94]">Select a cut to edit captions.</p>
           ) : (
             <button
               type="button"
@@ -178,7 +179,7 @@ export default function Inspector({
         </div>
 
         <div className={inspectorTab === 'font' ? 'space-y-4' : 'hidden space-y-4'}>
-          <label className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider block">
+          <label className="text-xs font-semibold text-[#B4B6B5] uppercase tracking-wider block">
             Subtitle Font Family
           </label>
           <select
@@ -197,7 +198,7 @@ export default function Inspector({
 
         <div className={inspectorTab === 'music' ? 'space-y-5' : 'hidden space-y-5'}>
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A7A9A8] uppercase tracking-wider block">
+            <label className="text-xs font-semibold text-[#B4B6B5] uppercase tracking-wider block">
               Background Music Track
             </label>
             <select
@@ -219,7 +220,7 @@ export default function Inspector({
             <div className="space-y-4 bg-[#191C20] p-4 rounded-2xl border border-white/5">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1.5 text-[#A7A9A8]">
+                  <span className="flex items-center gap-1.5 text-[#B4B6B5]">
                     <Volume2 className="w-3.5 h-3.5" />
                     Volume
                   </span>

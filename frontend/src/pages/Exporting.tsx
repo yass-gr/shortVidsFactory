@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   CheckCircle2, Loader2, ArrowLeft, FileText, Sparkles, Folder,
-  Trash2, ExternalLink, ChevronUp, ChevronDown, Check,
+  ExternalLink, ChevronUp, ChevronDown, Check,
 } from 'lucide-react'
 import { pollJob, revealDirectory } from '../api'
 import type { JobEvent } from '../types'
@@ -83,14 +83,14 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
         <div className="space-y-6">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-xs text-[#707477] hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-2 text-xs text-[#8A8F94] hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to editor</span>
           </button>
 
           <div>
-            <h3 className="text-xs font-bold text-[#707477] uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#8A8F94] uppercase tracking-wider">
               EXPORT STEPS
             </h3>
 
@@ -106,7 +106,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
                           ? 'bg-[#D5FF3F] text-black'
                           : status === 'in_progress'
                             ? 'bg-[#D5FF3F] text-black ring-4 ring-[#D5FF3F]/20'
-                            : 'bg-[#24282D] text-[#707477] border border-white/10'
+                            : 'bg-[#24282D] text-[#8A8F94] border border-white/10'
                       }`}
                     >
                       {status === 'completed' ? (
@@ -120,12 +120,12 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
                     <div>
                       <h4
                         className={`text-xs font-semibold ${
-                          status === 'completed' || status === 'in_progress' ? 'text-white' : 'text-[#707477]'
+                          status === 'completed' || status === 'in_progress' ? 'text-white' : 'text-[#8A8F94]'
                         }`}
                       >
                         {label}
                       </h4>
-                      <p className="text-[10px] text-[#707477]">
+                      <p className="text-[10px] text-[#8A8F94]">
                         {status === 'completed'
                           ? 'Done'
                           : status === 'in_progress'
@@ -142,7 +142,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
           {/* Info Box */}
           <div className="bg-[#191C20] p-4 rounded-2xl border border-white/5 space-y-3">
             <h5 className="text-xs font-bold text-white">What's happening?</h5>
-            <div className="space-y-2 text-[11px] text-[#A7A9A8] leading-relaxed">
+            <div className="space-y-2 text-[11px] text-[#B4B6B5] leading-relaxed">
               <div className="flex items-start gap-2">
                 <FileText className="w-3.5 h-3.5 text-[#D5FF3F] shrink-0 mt-0.5" />
                 <span>We're encoding your final video and audio, then saving it to your chosen folder.</span>
@@ -156,16 +156,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
         </div>
 
         {/* Need Help Footer Link */}
-        <div className="pt-4 border-t border-white/10">
-          <a
-            href="#help"
-            onClick={(e) => e.preventDefault()}
-            className="flex items-center justify-between text-xs text-[#707477] hover:text-white transition-colors"
-          >
-            <span>Need help? Read our export guide</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
+        <div className="pt-4 border-t border-white/10" />
       </aside>
 
       {/* MIDDLE PANEL: Export Status, Progress & Live Logs */}
@@ -174,7 +165,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
           {/* Main Title & File Name Pill */}
           <div className="space-y-3">
             <h1 className="text-3xl font-bold tracking-tight text-white">Exporting your video</h1>
-            <p className="text-xs text-[#A7A9A8]">
+            <p className="text-xs text-[#B4B6B5]">
               Please don't close ShortVidsFactory while we're exporting.
             </p>
 
@@ -227,7 +218,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
               </div>
               <button
                 onClick={() => setShowLogs(!showLogs)}
-                className="flex items-center gap-1 text-xs text-[#707477] hover:text-white transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-xs text-[#8A8F94] hover:text-white transition-colors cursor-pointer"
               >
                 <span>{showLogs ? 'Show less' : 'Show log'}</span>
                 {showLogs ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -235,7 +226,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
             </div>
 
             {showLogs && (
-              <div className="space-y-2 font-mono text-xs text-[#A7A9A8] max-h-[180px] overflow-y-auto pt-1">
+              <div className="space-y-2 font-mono text-xs text-[#B4B6B5] max-h-[180px] overflow-y-auto pt-1">
                 {logs.map((log, i) => (
                   <div key={i} className="flex items-center gap-3">
                     {log.status === 'completed' ? (
@@ -261,7 +252,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">Almost there!</h4>
-              <p className="text-xs text-[#A7A9A8]">
+              <p className="text-xs text-[#B4B6B5]">
                 Your short video will be saved to the destination folder when export is complete.
               </p>
             </div>
@@ -287,7 +278,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
           {/* Export Settings Summary */}
           <div className="space-y-2 pt-3 border-t border-white/10 text-xs">
             <h5 className="font-bold text-white">Export settings</h5>
-            <div className="space-y-1.5 text-[#A7A9A8]">
+            <div className="space-y-1.5 text-[#B4B6B5]">
               <div className="flex justify-between">
                 <span>Resolution</span>
                 <span className="font-mono text-white">1080 × 1920 (9:16)</span>
@@ -313,12 +304,12 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
 
           {/* Destination Path */}
           <div className="space-y-1.5 pt-2 border-t border-white/10">
-            <label className="text-[10px] font-bold text-[#707477] uppercase tracking-wider block">
+            <label className="text-[10px] font-bold text-[#8A8F94] uppercase tracking-wider block">
               Destination
             </label>
             <div className="bg-[#191C20] p-2.5 rounded-xl border border-white/10 flex items-center justify-between text-xs text-white">
               <span className="font-mono text-[11px] truncate">{destination || 'No destination set'}</span>
-              <Folder className="w-4 h-4 text-[#707477] shrink-0" />
+              <Folder className="w-4 h-4 text-[#8A8F94] shrink-0" />
             </div>
           </div>
 
@@ -330,16 +321,20 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Exporting…</span>
                 </div>
-                <p className="text-[11px] text-[#A7A9A8]">
+                <p className="text-[11px] text-[#B4B6B5]">
                   You'll be notified when it's done.
                 </p>
                 <button
                   onClick={onBack}
-                  className="w-full py-2 rounded-xl border border-[#FF5B63]/40 text-[#FF5B63] hover:bg-[#FF5B63]/10 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  title="The export keeps running in the background"
+                  className="w-full py-2 rounded-xl border border-white/10 text-[#B4B6B5] hover:bg-white/5 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Cancel export</span>
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to editor</span>
                 </button>
+                <p className="text-[10px] text-[#8A8F94] text-center">
+                  Export continues in the background.
+                </p>
               </div>
             )}
 
@@ -349,7 +344,7 @@ export default function Exporting({ projectId, jobId, destination, onBack }: Exp
                   <CheckCircle2 className="w-4 h-4 text-[#D5FF3F]" />
                   <span>Export completed successfully!</span>
                 </div>
-                <p className="text-[11px] text-[#A7A9A8] break-all">
+                <p className="text-[11px] text-[#B4B6B5] break-all">
                   {resultPath || 'Your video was saved to the destination folder.'}
                 </p>
                 <button

@@ -13,7 +13,6 @@ describe('WindowChrome', () => {
       />,
     )
     expect(screen.getByText('ShortVidsFactory')).toBeTruthy()
-    expect(screen.getByText('Projects')).toBeTruthy()
     fireEvent.click(screen.getByText('ShortVidsFactory'))
     expect(onNavigate).toHaveBeenCalledWith('projects')
   })

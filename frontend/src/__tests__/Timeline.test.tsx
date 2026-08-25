@@ -215,21 +215,38 @@ describe('Timeline', () => {
     expect(h.onSelect).toHaveBeenCalledWith(1)
   })
 
+  it('moves selection with arrow keys', () => {
+    const h = handlers()
+    render(<Timeline cuts={CUTS} selectedId={1} {...h} />)
+    const track = screen.getByTestId('timeline')
+    fireEvent.keyDown(track, { key: 'ArrowRight' })
+    expect(h.onSelect).toHaveBeenCalledWith(2)
+    fireEvent.keyDown(track, { key: 'ArrowLeft' })
+    expect(h.onSelect).toHaveBeenCalledWith(0)
+  })
+
+  it('duplicates the selected cut with D', () => {
+    const h = handlers()
+    render(<Timeline cuts={CUTS} selectedId={1} {...h} />)
+    fireEvent.keyDown(screen.getByTestId('timeline'), { key: 'd' })
+    expect(h.onDuplicate).toHaveBeenCalledWith(1)
+  })
+
   it('trims the left edge by dragging', () => {
     const h = handlers()
     render(<Timeline cuts={CUTS} selectedId={0} {...h} />)
-    fireEvent.mouseDown(screen.getByTestId('trim-left-0'), { clientX: 0 })
-    fireEvent.mouseMove(document.body, { clientX: 3 })
-    fireEvent.mouseUp(document.body)
+    fireEvent.pointerDown(screen.getByTestId('trim-left-0'), { clientX: 0, pointerId: 1 })
+    fireEvent.pointerMove(document.body, { clientX: 3 })
+    fireEvent.pointerUp(document.body)
     expect(h.onTrim).toHaveBeenCalledWith(0, 'left', 3)
   })
 
   it('trims the right edge by dragging', () => {
     const h = handlers()
     render(<Timeline cuts={CUTS} selectedId={0} {...h} />)
-    fireEvent.mouseDown(screen.getByTestId('trim-right-0'), { clientX: 0 })
-    fireEvent.mouseMove(document.body, { clientX: 2 })
-    fireEvent.mouseUp(document.body)
+    fireEvent.pointerDown(screen.getByTestId('trim-right-0'), { clientX: 0, pointerId: 1 })
+    fireEvent.pointerMove(document.body, { clientX: 2 })
+    fireEvent.pointerUp(document.body)
     expect(h.onTrim).toHaveBeenCalledWith(0, 'right', 6)
   })
 

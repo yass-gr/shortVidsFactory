@@ -32,6 +32,9 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
     return window.location.hash && window.location.hash.length > 1 ? fromHash : initialRoute
   })
   const saveEditorRef = useRef<(() => void) | null>(null)
+  const toastTimerRef = useRef<number | null>(null)
+  const editorDirtyRef = useRef(false)
+  const currentScreenRef = useRef<AppScreen>(screenForRoute(route))
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [activeProjectTitle, setActiveProjectTitle] = useState<string | null>(null)
@@ -45,14 +48,41 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   useEffect(() => {
     const m = route.match(/^\/project\/[^/]+\/(scripts|editor|export)/)
     setActiveProjectTitle(m ? `Project ${m[1]}` : null)
+    currentScreenRef.current = screenForRoute(route)
   }, [route])
 
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (editorDirtyRef.current) {
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [])
+
+  function setEditorDirty(dirty: boolean) {
+    editorDirtyRef.current = dirty
+  }
+
   function showToast(msg: string) {
+    if (toastTimerRef.current !== null) window.clearTimeout(toastTimerRef.current)
     setToastMessage(msg)
-    window.setTimeout(() => setToastMessage(null), 2500)
+    toastTimerRef.current = window.setTimeout(() => {
+      setToastMessage(null)
+      toastTimerRef.current = null
+    }, 2500)
   }
 
   function navigate(screen: AppScreen, projectId?: string) {
+    if (
+      editorDirtyRef.current &&
+      currentScreenRef.current === 'editor' &&
+      screen !== 'editor' &&
+      !window.confirm('You have unsaved changes. Leave the editor and discard them?')
+    ) {
+      return
+    }
     const screenPath: Record<AppScreen, string> = {
       projects: '/',
       upload: '/new',
@@ -80,7 +110,7 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's' && saveEditorRef.current) {
         e.preventDefault()
       }
     }
@@ -116,7 +146,9 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
           onRegisterSave={(fn) => {
             saveEditorRef.current = fn
           }}
+          onDirtyChange={setEditorDirty}
           onNavigateExport={navigateExport}
+          onBack={() => navigate('scripts', m[1])}
         />
       )
     } else {
@@ -131,8 +163,8 @@ export default function App({ initialRoute = '/' }: { initialRoute?: string }) {
   }
 
   return (
-    <div className="w-screen h-screen bg-[#0D0F11] flex flex-col justify-center items-center overflow-hidden font-sans antialiased text-[#F5F5F2] p-0 md:p-3">
-      <div className="w-full h-full max-w-[1600px] max-h-[1000px] bg-[#111316] border border-white/10 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+    <div className="w-screen h-screen bg-[#0D0F11] flex flex-col overflow-hidden font-sans antialiased text-[#F5F5F2] p-0">
+      <div className="w-full h-full bg-[#111316] flex flex-col overflow-hidden relative">
         <WindowChrome
           currentScreen={currentScreen}
           activeProjectTitle={activeProjectTitle}
